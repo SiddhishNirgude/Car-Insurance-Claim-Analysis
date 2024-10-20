@@ -9,9 +9,24 @@ import os
 # Set page configuration
 st.set_page_config(page_title="Car Insurance Claims Analysis", layout="wide")
 
-    
-merged_df = pd.read_csv("car_insurance_merged_data.csv")
-insurance_df = pd.read_csv("df_insurance_data_before_merge.csv")
+# Data loading function
+@st.cache_data
+def load_data():
+    try:
+        merged_df = pd.read_csv("car_insurance_merged_data.csv")
+        insurance_df = pd.read_csv("df_insurance_data_before_merge.csv")
+        return merged_df, insurance_df
+    except FileNotFoundError as e:
+        st.error(f"Error: {e}. Please make sure the CSV files are in the same directory as the app.")
+        return None, None
+
+# Load the data
+merged_df, insurance_df = load_data()
+
+if merged_df is None or insurance_df is None:
+    st.stop()
+else:
+    st.success("Data loaded successfully!")
 
 
 

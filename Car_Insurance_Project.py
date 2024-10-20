@@ -28,16 +28,12 @@ if merged_df is None or insurance_df is None:
 else:
     st.success("Data loaded successfully!")
 
-
-
-
 # Sidebar for navigation
 st.sidebar.title('Navigation')
-page = st.sidebar.radio("Go to", ['Data Overview', 'Data Statistics', 'Data Merging and Missingness', 'EDA', 'Correlation Analysis', 'Category Analysis', 'Slope Analysis'])
+page = st.sidebar.radio("Go to", ['Data Overview', 'Data Statistics', 'Data Merging and Missingness', 
+                                    'EDA', 'Correlation Analysis', 'Category Analysis', 'Slope Analysis'])
 
-
-
-#Step 2: Data Overview Page
+# Step 2: Data Overview Page
 if page == 'Data Overview':
     st.title('Data Overview')
     
@@ -49,8 +45,7 @@ if page == 'Data Overview':
     st.write(insurance_df.head())
     st.write(f"Shape: {insurance_df.shape}")
 
-
-#Step 3: Data Statistics Page
+# Step 3: Data Statistics Page
 elif page == 'Data Statistics':
     st.title('Data Statistics')
     
@@ -66,9 +61,7 @@ elif page == 'Data Statistics':
     st.subheader("Data Types")
     st.write(df.dtypes)
 
-
-
-#Step 4: Data Merging and Missingness Page
+# Step 4: Data Merging and Missingness Page
 elif page == 'Data Merging and Missingness':
     st.title('Data Merging and Missingness')
     
@@ -82,10 +75,7 @@ elif page == 'Data Merging and Missingness':
     st.subheader("Missing Values Count")
     st.write(merged_df.isnull().sum().sort_values(ascending=False))
 
-
-
-
-#Step 5: EDA Page
+# Step 5: EDA Page
 elif page == 'EDA':
     st.title('Exploratory Data Analysis')
     
@@ -114,11 +104,7 @@ elif page == 'EDA':
         
         st.plotly_chart(fig)
 
-
-
-
 # Step 6: Correlation Analysis
-# Assume 'page' is defined somewhere earlier in your code
 elif page == 'Correlation Analysis':
     st.title('Correlation Analysis')
 
@@ -131,7 +117,6 @@ elif page == 'Correlation Analysis':
     with col1:
         corr_method = st.selectbox("Select Correlation Method", ['pearson', 'spearman', 'kendall'])
     with col2:
-        # Use valid continuous color scales for imshow
         color_scheme = st.selectbox("Select Color Scheme", ['viridis', 'plasma', 'inferno', 'magma', 'cividis', 'Blues', 'BuGn', 'RdBu'])
 
     # Filter the DataFrame to only include selected columns
@@ -213,95 +198,62 @@ elif page == 'Category Analysis':
     st.plotly_chart(fig)
 
 # Step 8: Slope Analysis
-# Define the variable pairs for CLM_FREQ and CLM_AMT
-clm_freq_pairs = [
-    ('house_size', 'CLM_FREQ'),
-    ('price', 'CLM_FREQ'),
-    ('OLDCLAIM', 'CLM_FREQ'),
-    ('CAR_AGE', 'CLM_FREQ'),
-    ('INCOME', 'CLM_FREQ'),
-    ('OCCUPATION_z_Blue Collar', 'CLM_FREQ'),
-    ('EDUCATION_Bachelors', 'CLM_FREQ'),
-    ('CAR_TYPE_Panel Truck', 'CLM_FREQ'),
-    ('TIF', 'CLM_FREQ'),
-    ('YOJ', 'CLM_FREQ'),
-    ('acre_lot', 'CLM_FREQ'),
-]
-
-clm_amt_pairs = [
-    ('house_size', 'CLM_AMT'),
-    ('price', 'CLM_AMT'),
-    ('OLDCLAIM', 'CLM_AMT'),
-    ('CAR_AGE', 'CLM_AMT'),
-    ('INCOME', 'CLM_AMT'),
-    ('OCCUPATION_z_Blue Collar', 'CLM_AMT'),
-    ('EDUCATION_Bachelors', 'CLM_AMT'),
-    ('CAR_TYPE_Panel Truck', 'CLM_AMT'),
-    ('TIF', 'CLM_AMT'),
-    ('YOJ', 'CLM_AMT'),
-    ('acre_lot', 'CLM_AMT'),
-]
-
-# Function to calculate slopes and store them in a DataFrame
-def calculate_slopes(pairs, target):
-    slopes_data = []
-    
-    for var1, target in pairs:
-        # Filter out NaN and infinite values
-        mask = ~np.isnan(df_merged[var1]) & ~np.isnan(df_merged[target]) & ~np.isinf(df_merged[var1]) & ~np.isinf(df_merged[target])
-        x_clean = df_merged[var1][mask]
-        y_clean = df_merged[target][mask]
-        
-        if len(x_clean) < 2 or len(y_clean) < 2:
-            continue  # Skip if not enough data
-
-        # Check for constant values
-        if np.std(x_clean) == 0 or np.std(y_clean) == 0:
-            continue  # Skip if any variable is constant
-
-        # Fit a linear regression line
-        try:
-            slope, _ = np.polyfit(x_clean, y_clean, 1)
-            slope_direction = "Positive" if slope > 0 else "Negative"
-            slopes_data.append((var1, slope, slope_direction))
-        except np.linalg.LinAlgError:
-            continue  # Handle any fitting errors
-
-    return pd.DataFrame(slopes_data, columns=['Variable', 'Slope', 'Direction'])
-
-# Streamlit app for Slope Analysis
 elif page == 'Slope Analysis':
     st.title('Slope Analysis')
 
-    target = st.radio("Select Target Variable", ['CLM_FREQ', 'CLM_AMT'])
+    # Define the variable pairs for CLM_FREQ and CLM_AMT
+    clm_freq_pairs = [
+        ('house_size', 'CLM_FREQ'),
+        ('price', 'CLM_FREQ'),
+        ('OLDCLAIM', 'CLM_FREQ'),
+        ('CAR_AGE', 'CLM_FREQ'),
+        ('INCOME', 'CLM_FREQ'),
+        ('OCCUPATION_z_Blue Collar', 'CLM_FREQ'),
+        ('EDUCATION_Bachelors', 'CLM_FREQ'),
+        ('GENDER_Male', 'CLM_FREQ'),
+        ('TOWN_SIZE', 'CLM_FREQ')
+    ]
 
-    # Calculate slopes based on selected target variable
-    if target == 'CLM_FREQ':
-        slopes_df = calculate_slopes(clm_freq_pairs, target)
+    clm_amt_pairs = [
+        ('house_size', 'CLM_AMT'),
+        ('price', 'CLM_AMT'),
+        ('OLDCLAIM', 'CLM_AMT'),
+        ('CAR_AGE', 'CLM_AMT'),
+        ('INCOME', 'CLM_AMT'),
+        ('OCCUPATION_z_Blue Collar', 'CLM_AMT'),
+        ('EDUCATION_Bachelors', 'CLM_AMT'),
+        ('GENDER_Male', 'CLM_AMT'),
+        ('TOWN_SIZE', 'CLM_AMT')
+    ]
+
+    # Select variable pairs for analysis
+    analysis_choice = st.radio("Choose Analysis Type", ['CLM_FREQ Analysis', 'CLM_AMT Analysis'])
+
+    if analysis_choice == 'CLM_FREQ Analysis':
+        variable_pairs = clm_freq_pairs
+        y_label = 'Claim Frequency'
     else:
-        slopes_df = calculate_slopes(clm_amt_pairs, target)
-
-    # Display the slope summary table
-    st.subheader(f"Slope Summary Table for {target}")
-    st.write(slopes_df)
-
-    # Visualization of slopes using scatter plots
-    st.write("Slope analysis visualization goes here.")
-
-    # Create scatter plots for the selected target variable
-    if target == 'CLM_FREQ':
-        for var1, target in clm_freq_pairs:
-            fig = px.scatter(df_merged, x=var1, y=target, trendline='ols',
-                             labels={var1: var1, target: target},
-                             title=f"{var1} vs {target}")
-            st.plotly_chart(fig)
-
-    else:
-        for var1, target in clm_amt_pairs:
-            fig = px.scatter(df_merged, x=var1, y=target, trendline='ols',
-                             labels={var1: var1, target: target},
-                             title=f"{var1} vs {target}")
-            st.plotly_chart(fig)
-
-
+        variable_pairs = clm_amt_pairs
+        y_label = 'Claim Amount'
     
+    # Plot slope analysis
+    for x_var, y_var in variable_pairs:
+        slope = np.polyfit(insurance_df[x_var], insurance_df[y_var], 1)
+        line = np.poly1d(slope)
+        
+        fig, ax = plt.subplots()
+        ax.scatter(insurance_df[x_var], insurance_df[y_var], alpha=0.5)
+        ax.plot(insurance_df[x_var], line(insurance_df[x_var]), color='red')
+        ax.set_xlabel(x_var)
+        ax.set_ylabel(y_label)
+        ax.set_title(f'Slope Analysis: {x_var} vs {y_var}')
+        st.pyplot(fig)
+
+# Add an "About" section
+if st.sidebar.checkbox("Show About"):
+    st.sidebar.title("About")
+    st.sidebar.info(
+        "This app is designed to analyze car insurance claims data. "
+        "It provides various functionalities including data overview, statistics, "
+        "exploratory data analysis, correlation analysis, and more."
+    )

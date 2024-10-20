@@ -117,7 +117,7 @@ elif page == 'EDA':
 
 
 
-#Step 6: Correlation Analysis
+# Step 6: Correlation Analysis
 # Assume 'page' is defined somewhere earlier in your code
 elif page == 'Correlation Analysis':
     st.title('Correlation Analysis')
@@ -212,11 +212,7 @@ elif page == 'Category Analysis':
                  title=f'Average {metric} by {category}')
     st.plotly_chart(fig)
 
-
-
-
-
-#Step 8: Slope Analysis
+# Step 8: Slope Analysis
 # Define the variable pairs for CLM_FREQ and CLM_AMT
 clm_freq_pairs = [
     ('house_size', 'CLM_FREQ'),
@@ -275,36 +271,37 @@ def calculate_slopes(pairs, target):
 
 # Streamlit app for Slope Analysis
 elif page == 'Slope Analysis':
-st.title('Slope Analysis')
+    st.title('Slope Analysis')
 
-target = st.radio("Select Target Variable", ['CLM_FREQ', 'CLM_AMT'])
+    target = st.radio("Select Target Variable", ['CLM_FREQ', 'CLM_AMT'])
 
-# Calculate slopes based on selected target variable
-if target == 'CLM_FREQ':
-    slopes_df = calculate_slopes(clm_freq_pairs, target)
-else:
-    slopes_df = calculate_slopes(clm_amt_pairs, target)
+    # Calculate slopes based on selected target variable
+    if target == 'CLM_FREQ':
+        slopes_df = calculate_slopes(clm_freq_pairs, target)
+    else:
+        slopes_df = calculate_slopes(clm_amt_pairs, target)
 
-# Display the slope summary table
-st.subheader(f"Slope Summary Table for {target}")
-st.write(slopes_df)
+    # Display the slope summary table
+    st.subheader(f"Slope Summary Table for {target}")
+    st.write(slopes_df)
 
-# Visualization of slopes using scatter plots
-st.write("Slope analysis visualization goes here.")
+    # Visualization of slopes using scatter plots
+    st.write("Slope analysis visualization goes here.")
 
-# Create scatter plots for the selected target variable
-if target == 'CLM_FREQ':
-    for var1, target in clm_freq_pairs:
-        fig = px.scatter(df_merged, x=var1, y=target, trendline='ols',
-                         labels={var1: var1, target: target},
-                         title=f"{var1} vs {target}")
-        st.plotly_chart(fig)
+    # Create scatter plots for the selected target variable
+    if target == 'CLM_FREQ':
+        for var1, target in clm_freq_pairs:
+            fig = px.scatter(df_merged, x=var1, y=target, trendline='ols',
+                             labels={var1: var1, target: target},
+                             title=f"{var1} vs {target}")
+            st.plotly_chart(fig)
 
-else:
-    for var1, target in clm_amt_pairs:
-        fig = px.scatter(df_merged, x=var1, y=target, trendline='ols',
-                         labels={var1: var1, target: target},
-                         title=f"{var1} vs {target}")
-        st.plotly_chart(fig)
+    else:
+        for var1, target in clm_amt_pairs:
+            fig = px.scatter(df_merged, x=var1, y=target, trendline='ols',
+                             labels={var1: var1, target: target},
+                             title=f"{var1} vs {target}")
+            st.plotly_chart(fig)
+
 
     

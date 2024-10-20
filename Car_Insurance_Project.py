@@ -9,24 +9,12 @@ import os
 # Set page configuration
 st.set_page_config(page_title="Car Insurance Claims Analysis", layout="wide")
 
-# Data loading function
-@st.cache_data
-def load_data():
-    base_path = ""
-    merged_df_path = os.path.join(base_path, "car_insurance_merged_data.csv")
-    insurance_df_path = os.path.join(base_path, "df_insurance_data_before_merge.csv")
     
-    merged_df = pd.read_csv(merged_df_path)
-    insurance_df = pd.read_csv(insurance_df_path)
-    return merged_df, insurance_df
+merged_df = pd.read_csv("")
+insurance_df = pd.read_csv("")
 
-# Load the data
-try:
-    merged_df, insurance_df = load_data()
-    st.success("Data loaded successfully!")
-except Exception as e:
-    st.error(f"Error loading data: {e}")
-    st.stop()
+
+
 
 # Sidebar for navigation
 st.sidebar.title('Navigation')

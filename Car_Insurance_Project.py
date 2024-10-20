@@ -10,8 +10,8 @@ import os
 st.set_page_config(page_title="Car Insurance Claims Analysis", layout="wide")
 
     
-merged_df = pd.read_csv("")
-insurance_df = pd.read_csv("")
+merged_df = pd.read_csv("car_insurance_merged_data.csv")
+insurance_df = pd.read_csv("df_insurance_data_before_merge.csv")
 
 
 

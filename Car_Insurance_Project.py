@@ -217,16 +217,94 @@ elif page == 'Category Analysis':
 
 
 #Step 8: Slope Analysis
+# Define the variable pairs for CLM_FREQ and CLM_AMT
+clm_freq_pairs = [
+    ('house_size', 'CLM_FREQ'),
+    ('price', 'CLM_FREQ'),
+    ('OLDCLAIM', 'CLM_FREQ'),
+    ('CAR_AGE', 'CLM_FREQ'),
+    ('INCOME', 'CLM_FREQ'),
+    ('OCCUPATION_z_Blue Collar', 'CLM_FREQ'),
+    ('EDUCATION_Bachelors', 'CLM_FREQ'),
+    ('CAR_TYPE_Panel Truck', 'CLM_FREQ'),
+    ('TIF', 'CLM_FREQ'),
+    ('YOJ', 'CLM_FREQ'),
+    ('acre_lot', 'CLM_FREQ'),
+]
+
+clm_amt_pairs = [
+    ('house_size', 'CLM_AMT'),
+    ('price', 'CLM_AMT'),
+    ('OLDCLAIM', 'CLM_AMT'),
+    ('CAR_AGE', 'CLM_AMT'),
+    ('INCOME', 'CLM_AMT'),
+    ('OCCUPATION_z_Blue Collar', 'CLM_AMT'),
+    ('EDUCATION_Bachelors', 'CLM_AMT'),
+    ('CAR_TYPE_Panel Truck', 'CLM_AMT'),
+    ('TIF', 'CLM_AMT'),
+    ('YOJ', 'CLM_AMT'),
+    ('acre_lot', 'CLM_AMT'),
+]
+
+# Function to calculate slopes and store them in a DataFrame
+def calculate_slopes(pairs, target):
+    slopes_data = []
+    
+    for var1, target in pairs:
+        # Filter out NaN and infinite values
+        mask = ~np.isnan(df_merged[var1]) & ~np.isnan(df_merged[target]) & ~np.isinf(df_merged[var1]) & ~np.isinf(df_merged[target])
+        x_clean = df_merged[var1][mask]
+        y_clean = df_merged[target][mask]
+        
+        if len(x_clean) < 2 or len(y_clean) < 2:
+            continue  # Skip if not enough data
+
+        # Check for constant values
+        if np.std(x_clean) == 0 or np.std(y_clean) == 0:
+            continue  # Skip if any variable is constant
+
+        # Fit a linear regression line
+        try:
+            slope, _ = np.polyfit(x_clean, y_clean, 1)
+            slope_direction = "Positive" if slope > 0 else "Negative"
+            slopes_data.append((var1, slope, slope_direction))
+        except np.linalg.LinAlgError:
+            continue  # Handle any fitting errors
+
+    return pd.DataFrame(slopes_data, columns=['Variable', 'Slope', 'Direction'])
+
+# Streamlit app for Slope Analysis
 elif page == 'Slope Analysis':
-    st.title('Slope Analysis')
+st.title('Slope Analysis')
+
+target = st.radio("Select Target Variable", ['CLM_FREQ', 'CLM_AMT'])
+
+# Calculate slopes based on selected target variable
+if target == 'CLM_FREQ':
+    slopes_df = calculate_slopes(clm_freq_pairs, target)
+else:
+    slopes_df = calculate_slopes(clm_amt_pairs, target)
+
+# Display the slope summary table
+st.subheader(f"Slope Summary Table for {target}")
+st.write(slopes_df)
+
+# Visualization of slopes using scatter plots
+st.write("Slope analysis visualization goes here.")
+
+# Create scatter plots for the selected target variable
+if target == 'CLM_FREQ':
+    for var1, target in clm_freq_pairs:
+        fig = px.scatter(df_merged, x=var1, y=target, trendline='ols',
+                         labels={var1: var1, target: target},
+                         title=f"{var1} vs {target}")
+        st.plotly_chart(fig)
+
+else:
+    for var1, target in clm_amt_pairs:
+        fig = px.scatter(df_merged, x=var1, y=target, trendline='ols',
+                         labels={var1: var1, target: target},
+                         title=f"{var1} vs {target}")
+        st.plotly_chart(fig)
+
     
-    target = st.radio("Select Target Variable", ['CLM_FREQ', 'CLM_AMT'])
-    
-    # You'll need to implement the calculate_slopes function based on your specific requirements
-    # slopes_df = calculate_slopes(clm_freq_pairs if target == 'CLM_FREQ' else clm_amt_pairs, target)
-    
-    # st.subheader(f"Slope Summary Table for {target}")
-    # st.write(slopes_df)
-    
-    st.write("Slope analysis visualization goes here.")
-    # You'll need to implement the slope analysis visualization based on your specific requirements

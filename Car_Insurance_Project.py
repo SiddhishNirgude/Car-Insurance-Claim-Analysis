@@ -118,6 +118,7 @@ elif page == 'EDA':
 
 
 #Step 6: Correlation Analysis
+# Assume 'page' is defined somewhere earlier in your code
 elif page == 'Correlation Analysis':
     st.title('Correlation Analysis')
 
@@ -162,36 +163,34 @@ elif page == 'Correlation Analysis':
     st.dataframe(top_25_corr_df.style.format({'Correlation': '{:.4f}'}), height=400)
     
     # Top 10 correlations horizontal bar plot
-    
-st.subheader("Top 10 Correlations - Horizontal Bar Plot")
-top_10_corr = top_corr.head(10)
+    st.subheader("Top 10 Correlations - Horizontal Bar Plot")
+    top_10_corr = top_corr.head(10)
 
-# Check if top_10_corr is not empty
-if not top_10_corr.empty:
-    top_10_corr_df = pd.DataFrame(top_10_corr).reset_index()
-    
-    # Ensure that the DataFrame has the correct number of columns
-    if top_10_corr_df.shape[1] == 2:
-        top_10_corr_df.columns = ['Variable Pair', 'Correlation']
-        top_10_corr_df['Variable Pair'] = top_10_corr_df['Variable Pair'].apply(lambda x: f"{x[0]} - {x[1]}")
-    
-        fig_bar = px.bar(top_10_corr_df, 
-                         x='Correlation', 
-                         y='Variable Pair', 
-                         orientation='h',
-                         title='Top 10 Correlations',
-                         color='Correlation',
-                         color_continuous_scale=color_scheme)
+    # Check if top_10_corr is not empty
+    if not top_10_corr.empty:
+        top_10_corr_df = pd.DataFrame(top_10_corr).reset_index()
+        
+        # Ensure that the DataFrame has the correct number of columns
+        if top_10_corr_df.shape[1] == 2:
+            top_10_corr_df.columns = ['Variable Pair', 'Correlation']
+            top_10_corr_df['Variable Pair'] = top_10_corr_df['Variable Pair'].apply(lambda x: f"{x[0]} - {x[1]}")
+        
+            fig_bar = px.bar(top_10_corr_df, 
+                             x='Correlation', 
+                             y='Variable Pair', 
+                             orientation='h',
+                             title='Top 10 Correlations',
+                             color='Correlation',
+                             color_continuous_scale=color_scheme)
 
-        fig_bar.update_traces(texttemplate='%{x:.4f}', textposition='outside')
-        fig_bar.update_layout(yaxis={'categoryorder':'total ascending'})
-        st.plotly_chart(fig_bar)
+            fig_bar.update_traces(texttemplate='%{x:.4f}', textposition='outside')
+            fig_bar.update_layout(yaxis={'categoryorder':'total ascending'})
+            st.plotly_chart(fig_bar)
+        else:
+            st.warning("Not enough data to display top correlations.")
     else:
-        st.warning("Not enough data to display top correlations.")
-else:
-    st.warning("No correlations to display.")
+        st.warning("No correlations to display.")
 
-    
     # Download button
     csv = corr_matrix.to_csv(index=True)
     st.download_button(
@@ -201,11 +200,7 @@ else:
         mime="text/csv",
     )
 
-
-
-
-
-#Step 7: Category Analysis
+# Step 7: Category Analysis
 elif page == 'Category Analysis':
     st.title('Category Analysis')
     

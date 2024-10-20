@@ -120,26 +120,27 @@ elif page == 'EDA':
 #Step 6: Correlation Analysis
 elif page == 'Correlation Analysis':
     st.title('Correlation Analysis')
-    
+
     col1, col2 = st.columns(2)
     with col1:
         corr_method = st.selectbox("Select Correlation Method", ['pearson', 'spearman', 'kendall'])
     with col2:
-        color_scheme = st.selectbox("Select Color Scheme", ['coolwarm', 'viridis', 'plasma', 'YlGnBu', 'RdBu'])
-    
+        # Use valid continuous color scales for imshow
+        color_scheme = st.selectbox("Select Color Scheme", ['viridis', 'plasma', 'inferno', 'magma', 'cividis', 'Blues', 'BuGn', 'RdBu'])
+
     numeric_df = merged_df.select_dtypes(include=[np.number])
     corr_matrix = numeric_df.corr(method=corr_method)
-    
+
     # Heatmap
     fig_heatmap = px.imshow(corr_matrix, 
-                    color_continuous_scale=color_scheme, 
-                    title=f'{corr_method.capitalize()} Correlation Heatmap',
-                    labels=dict(color="Correlation"),
-                    zmin=-1, zmax=1)
-    
+                            color_continuous_scale=color_scheme, 
+                            title=f'{corr_method.capitalize()} Correlation Heatmap',
+                            labels=dict(color="Correlation"),
+                            zmin=-1, zmax=1)
+
     fig_heatmap.update_traces(hovertemplate='X: %{x}<br>Y: %{y}<br>Correlation: %{z:.2f}<extra></extra>')
     fig_heatmap.update_layout(width=800, height=800)
-    
+
     st.plotly_chart(fig_heatmap)
     
     # Top correlations
@@ -166,7 +167,7 @@ elif page == 'Correlation Analysis':
                      title='Top 10 Correlations',
                      color='Correlation',
                      color_continuous_scale=color_scheme)
-    
+
     fig_bar.update_traces(texttemplate='%{x:.4f}', textposition='outside')
     fig_bar.update_layout(yaxis={'categoryorder':'total ascending'})
     st.plotly_chart(fig_bar)

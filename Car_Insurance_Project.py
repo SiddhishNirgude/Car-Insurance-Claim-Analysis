@@ -12,7 +12,7 @@ st.set_page_config(page_title="Car Insurance Claims Analysis", layout="wide")
 # Data loading function
 @st.cache_data
 def load_data():
-    base_path = r"D:\USA\Semester 1 MSU\CMSE 830"
+    base_path = ""
     merged_df_path = os.path.join(base_path, "car_insurance_merged_data.csv")
     insurance_df_path = os.path.join(base_path, "df_insurance_data_before_merge.csv")
     

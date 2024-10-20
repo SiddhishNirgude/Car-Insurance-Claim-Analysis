@@ -121,6 +121,11 @@ elif page == 'EDA':
 elif page == 'Correlation Analysis':
     st.title('Correlation Analysis')
 
+    # Dropdown to select the number of variables
+    all_numeric_columns = merged_df.select_dtypes(include=[np.number]).columns.tolist()
+    selected_columns = st.multiselect("Select Variables for Correlation Analysis", options=all_numeric_columns, default=all_numeric_columns)
+
+    # Correlation method selection
     col1, col2 = st.columns(2)
     with col1:
         corr_method = st.selectbox("Select Correlation Method", ['pearson', 'spearman', 'kendall'])
@@ -128,7 +133,10 @@ elif page == 'Correlation Analysis':
         # Use valid continuous color scales for imshow
         color_scheme = st.selectbox("Select Color Scheme", ['viridis', 'plasma', 'inferno', 'magma', 'cividis', 'Blues', 'BuGn', 'RdBu'])
 
-    numeric_df = merged_df.select_dtypes(include=[np.number])
+    # Filter the DataFrame to only include selected columns
+    numeric_df = merged_df[selected_columns]
+
+    # Calculate the correlation matrix for selected columns
     corr_matrix = numeric_df.corr(method=corr_method)
 
     # Heatmap

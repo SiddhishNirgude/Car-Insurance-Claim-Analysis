@@ -121,19 +121,64 @@ elif page == 'EDA':
 elif page == 'Correlation Analysis':
     st.title('Correlation Analysis')
     
-    corr_method = st.selectbox("Select Correlation Method", ['pearson', 'spearman', 'kendall'])
-    color_scheme = st.selectbox("Select Color Scheme", ['coolwarm', 'viridis', 'plasma'])
+    col1, col2 = st.columns(2)
+    with col1:
+        corr_method = st.selectbox("Select Correlation Method", ['pearson', 'spearman', 'kendall'])
+    with col2:
+        color_scheme = st.selectbox("Select Color Scheme", ['coolwarm', 'viridis', 'plasma', 'YlGnBu', 'RdBu'])
     
     numeric_df = merged_df.select_dtypes(include=[np.number])
     corr_matrix = numeric_df.corr(method=corr_method)
     
-    fig = px.imshow(corr_matrix, color_continuous_scale=color_scheme, title=f'{corr_method.capitalize()} Correlation Heatmap')
-    st.plotly_chart(fig)
+    # Heatmap
+    fig_heatmap = px.imshow(corr_matrix, 
+                    color_continuous_scale=color_scheme, 
+                    title=f'{corr_method.capitalize()} Correlation Heatmap',
+                    labels=dict(color="Correlation"),
+                    zmin=-1, zmax=1)
     
-    st.subheader("Top 25 Correlations")
+    fig_heatmap.update_traces(hovertemplate='X: %{x}<br>Y: %{y}<br>Correlation: %{z:.2f}<extra></extra>')
+    fig_heatmap.update_layout(width=800, height=800)
+    
+    st.plotly_chart(fig_heatmap)
+    
+    # Top correlations
     top_corr = corr_matrix.unstack().sort_values(ascending=False).drop_duplicates()
-    top_25_corr = top_corr[top_corr < 1].head(25)
-    st.write(top_25_corr)
+    top_corr = top_corr[top_corr < 1]  # Remove self-correlations
+    
+    # Top 25 correlations table
+    st.subheader("Top 25 Correlations")
+    top_25_corr_df = pd.DataFrame(top_corr.head(25)).reset_index()
+    top_25_corr_df.columns = ['Variable 1', 'Variable 2', 'Correlation']
+    st.dataframe(top_25_corr_df.style.format({'Correlation': '{:.4f}'}), height=400)
+    
+    # Top 10 correlations horizontal bar plot
+    st.subheader("Top 10 Correlations - Horizontal Bar Plot")
+    top_10_corr = top_corr.head(10)
+    top_10_corr_df = pd.DataFrame(top_10_corr).reset_index()
+    top_10_corr_df.columns = ['Variable Pair', 'Correlation']
+    top_10_corr_df['Variable Pair'] = top_10_corr_df['Variable Pair'].apply(lambda x: f"{x[0]} - {x[1]}")
+    
+    fig_bar = px.bar(top_10_corr_df, 
+                     x='Correlation', 
+                     y='Variable Pair', 
+                     orientation='h',
+                     title='Top 10 Correlations',
+                     color='Correlation',
+                     color_continuous_scale=color_scheme)
+    
+    fig_bar.update_traces(texttemplate='%{x:.4f}', textposition='outside')
+    fig_bar.update_layout(yaxis={'categoryorder':'total ascending'})
+    st.plotly_chart(fig_bar)
+    
+    # Download button
+    csv = corr_matrix.to_csv(index=True)
+    st.download_button(
+        label="Download Full Correlation Matrix as CSV",
+        data=csv,
+        file_name=f"correlation_matrix_{corr_method}.csv",
+        mime="text/csv",
+    )
 
 
 

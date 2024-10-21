@@ -7,6 +7,7 @@ import plotly.express as px
 import os
 
 # Set page configuration
+# Set page configuration
 st.set_page_config(page_title="Car Insurance Claims Analysis", layout="wide")
 
 # Data loading function
@@ -37,7 +38,7 @@ page = st.sidebar.radio("Go to", ['Data Overview', 'Data Statistics', 'Data Merg
 # Step 2: Data Overview Page
 if page == 'Data Overview':
     st.title('Data Overview')
-    
+
     st.header("Merged Dataset")
     st.write(merged_df.head())
     st.write(f"Shape: {merged_df.shape}")
@@ -49,6 +50,31 @@ if page == 'Data Overview':
     st.header("Real Estate Dataset")
     st.write(real_estate_df.head())
     st.write(f"Shape: {real_estate_df.shape}")
+    
+    # Explanation of merging process
+    st.subheader("Merging Process Explanation")
+    
+    st.markdown("""
+    ### Primary Dataset: Car Insurance Claims
+    - The car insurance claims dataset serves as the **primary** dataset. It contains information about car insurance claims, such as claim amounts, accident details, and policyholder data.
+    
+    ### Secondary Dataset: Real Estate Data
+    - The real estate dataset contains details about **house prices**, **lot size**, and **house size**. From this dataset, we have extracted the following columns:
+      - `price`
+      - `house_size`
+      - `acre_lot`
+    
+    ### Merging Criteria
+    - The two datasets were merged on the `ZIP_CODE` column using a **left merge**. This ensures that all records from the car insurance dataset are kept, while real estate data is added where available.
+    
+    ### Challenges Faced During Merging
+    1. **Duplicate ZIP Codes**: We checked for duplicate ZIP codes in the merged dataset to avoid duplicating rows. The `ZIP_CODE` field must uniquely identify locations.
+    2. **Missing Values**: After merging, there were missing values in some of the real estate fields (`price`, `house_size`, etc.) for ZIP codes that did not have corresponding real estate data.
+    3. **Invalid ZIP Codes**: We validated that all ZIP codes in the merged dataset are 5-digit numbers.
+    4. **State Mismatch**: We ensured that the `STATE` column in both datasets contained valid two-letter US state codes. In case of conflicts, we kept the state information from the car insurance dataset.
+
+    """)
+
 
 
 # Step 3: Data Statistics Page

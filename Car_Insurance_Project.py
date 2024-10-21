@@ -9,6 +9,18 @@ import os
 # Set page configuration
 st.set_page_config(page_title="Car Insurance Claims Analysis", layout="wide")
 
+# Custom CSS for background color
+st.markdown(
+    """
+    <style>
+    .reportview-container {
+        background-color: #FAF3E0;  /* Light cream/ivory color */
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 # Data loading function
 @st.cache_data
 def load_data():
@@ -34,10 +46,15 @@ if (merged_df is None or insurance_df is None or real_estate_df is None or
 else:
     st.success("Data loaded successfully!")
 
+# Display the car insurance illustration
+st.image("car-insurance-illustration-concept-white-background_701961-840.png", 
+         caption="Car Insurance Illustration", use_column_width=True)
+
 # Sidebar for navigation
 st.sidebar.title('Navigation')
 page = st.sidebar.radio("Go to", ['Data Overview', 'Data Statistics', 'Data Merging and Missingness', 
                                     'EDA', 'Correlation Analysis', 'Category Analysis', 'Slope Analysis'])
+
 
 # Step 2: Data Overview Page
 if page == 'Data Overview':

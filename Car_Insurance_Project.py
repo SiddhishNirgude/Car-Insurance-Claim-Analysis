@@ -131,8 +131,6 @@ if page == 'Data Statistics':
     - **House and Lot Size**: Comparing statistics on house size and lot size across ZIP codes helps in understanding the distribution of property characteristics.
     """)
 
-
-
 # Step 4: Data Merging and Missingness Page
 elif page == 'Data Merging and Missingness':
     st.title('Data Merging and Missingness')
@@ -151,7 +149,19 @@ elif page == 'Data Merging and Missingness':
     st.subheader("Missing Values Count Before Handling")
     st.write(step1_df.isnull().sum().sort_values(ascending=False))
 
-    # Step 2: Visualization after handling missing values for insurance columns
+    # Step 2: Explanation of handling missing values for insurance columns
+    st.header("Handling Missing Values for Insurance Columns")
+    st.markdown("""
+    In the car insurance dataset, we addressed missing values as follows:
+    - **AGE**: Missing values were filled with the median age to avoid skewing the data.
+    - **Years of Job (YOJ)**: Filled missing values with the median, providing a central tendency measure.
+    - **INCOME**: Cleaned the income column by removing dollar signs and commas, then filled missing values with the median.
+    - **HOME_VAL**: Similar to INCOME, cleaned and filled missing values with the median to ensure consistency.
+    - **OCCUPATION**: Missing values were filled with the mode, representing the most common occupation.
+    - **CAR_AGE**: Filled missing values with the median to maintain data integrity.
+    """)
+
+    # Visualization after handling missing values for insurance columns
     st.subheader("Missing Values Heatmap After Handling Insurance Columns")
     fig, ax = plt.subplots(figsize=(10, 6))
     sns.heatmap(step2_df.isnull(), cbar=False, cmap='viridis', ax=ax)
@@ -159,10 +169,18 @@ elif page == 'Data Merging and Missingness':
     st.pyplot(fig)
 
     # Display remaining missing values in the cleaned dataset
-    st.markdown("### Missing Values in Each Column After Handling:")
+    st.markdown("### Missing Values in Each Column After Handling Insurance Data:")
     st.write(step2_df.isnull().sum().sort_values(ascending=False))
 
-    # Step 3: Final Heatmap to Show No Missingness in Merged Data
+    # Step 3: Explanation of KNN imputation for real estate data
+    st.header("Handling Missing Values for Real Estate Columns")
+    st.markdown("""
+    For the real estate dataset, we utilized KNN imputation to handle missing values:
+    - **Numeric Columns**: `price`, `house_size`, `acre_lot`, and `CAR_AGE` were imputed using KNN, which considers the average of the nearest neighbors to fill in missing values.
+    - **Categorical Column**: `CITY` was filled with the mode, ensuring that the most frequent city was used for imputation.
+    """)
+
+    # Final Heatmap to Show No Missingness in Merged Data
     st.subheader("Final Missing Values Heatmap After All Cleaning Steps")
     fig, ax = plt.subplots(figsize=(10, 6))
     sns.heatmap(merged_df.isnull(), cbar=False, cmap='viridis', ax=ax)
@@ -175,6 +193,7 @@ elif page == 'Data Merging and Missingness':
 
     # Success message
     st.success("Missing values visualizations have been displayed successfully.")
+
 
 
 # Step 5: EDA Page

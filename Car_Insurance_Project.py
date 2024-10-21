@@ -7,25 +7,29 @@ import plotly.express as px
 import os
 
 # Set page configuration
-# Set page configuration
 st.set_page_config(page_title="Car Insurance Claims Analysis", layout="wide")
 
 # Data loading function
 @st.cache_data
 def load_data():
     try:
+        # Load the merged dataset and the step CSV files for missingness visualization
         merged_df = pd.read_csv("car_insurance_merged_data.csv")
         insurance_df = pd.read_csv("df_insurance_data_before_merge.csv")
         real_estate_df = pd.read_csv("reduced_real_estate_data.csv")  # Load real estate data
-        return merged_df, insurance_df, real_estate_df
+        step1_df = pd.read_csv("step1_missingness_after_merging.csv")  # Load step 1 CSV
+        step2_df = pd.read_csv("step2_missingness_after_cleaning_insurance.csv")  # Load step 2 CSV
+        return merged_df, insurance_df, real_estate_df, step1_df, step2_df
     except FileNotFoundError as e:
         st.error(f"Error: {e}. Please make sure the CSV files are in the same directory as the app.")
-        return None, None, None
+        return None, None, None, None, None
 
 # Load the data
-merged_df, insurance_df, real_estate_df = load_data()
+merged_df, insurance_df, real_estate_df, step1_df, step2_df = load_data()
 
-if merged_df is None or insurance_df is None or real_estate_df is None:
+# Check if all data was loaded successfully
+if (merged_df is None or insurance_df is None or real_estate_df is None or 
+    step1_df is None or step2_df is None):
     st.stop()
 else:
     st.success("Data loaded successfully!")
@@ -132,96 +136,45 @@ if page == 'Data Statistics':
 # Step 4: Data Merging and Missingness Page
 elif page == 'Data Merging and Missingness':
     st.title('Data Merging and Missingness')
-    
+
     st.write("### Explanation of Merging Process")
     st.write("Describe the merging process of the datasets, highlighting key considerations and any data integrity checks performed.")
 
-    # Initial missing value visualization for the merged dataset
+    # Step 1: Initial missing value visualization for the merged dataset
     st.subheader("Missing Values Heatmap Before Handling")
     fig, ax = plt.subplots(figsize=(10, 6))
-    sns.heatmap(merged_df.isnull(), cbar=False, cmap='viridis', ax=ax)
-    plt.title('Missing Values Heatmap Before Handling')
+    sns.heatmap(step1_df.isnull(), cbar=False, cmap='viridis', ax=ax)
+    plt.title('Missing Values Heatmap After Merging')
     st.pyplot(fig)
 
     # Displaying missing values count before handling
     st.subheader("Missing Values Count Before Handling")
-    st.write(merged_df.isnull().sum().sort_values(ascending=False))
+    st.write(step1_df.isnull().sum().sort_values(ascending=False))
 
-    # Handling Missing Values for Insurance Columns
-    st.header("Handle Missing Values for Insurance Columns")
-    
-    # Actions taken for handling missing values
-    st.markdown("""
-    In the car insurance dataset, we addressed missing values as follows:
-    - **AGE**: Filled missing values with the median.
-    - **Years of Job (YOJ)**: Filled missing values with the median.
-    - **INCOME**: Cleaned and filled missing values with the median.
-    - **HOME_VAL**: Cleaned and filled missing values with the median.
-    - **OCCUPATION**: Filled missing values with the mode.
-    - **CAR_AGE**: Filled missing values with the median.
-    """)
-
-    # Visualization after handling missing values for insurance columns
+    # Step 2: Visualization after handling missing values for insurance columns
     st.subheader("Missing Values Heatmap After Handling Insurance Columns")
-    merged_df['AGE'].fillna(merged_df['AGE'].median(), inplace=True)
-    merged_df['YOJ'].fillna(merged_df['YOJ'].median(), inplace=True)
-    merged_df['INCOME'] = merged_df['INCOME'].replace({'\$': '', ',': ''}, regex=True).astype(float)
-    merged_df['INCOME'].fillna(merged_df['INCOME'].median(), inplace=True)
-    merged_df['HOME_VAL'] = merged_df['HOME_VAL'].replace({'\$': '', ',': ''}, regex=True).astype(float)
-    merged_df['HOME_VAL'].fillna(merged_df['HOME_VAL'].median(), inplace=True)
-    merged_df['OCCUPATION'].fillna(merged_df['OCCUPATION'].mode()[0], inplace=True)
-    merged_df['CAR_AGE'].fillna(merged_df['CAR_AGE'].median(), inplace=True)
-    
+    fig, ax = plt.subplots(figsize=(10, 6))
+    sns.heatmap(step2_df.isnull(), cbar=False, cmap='viridis', ax=ax)
+    plt.title('Missing Values Heatmap After Cleaning Insurance Data')
+    st.pyplot(fig)
+
+    # Display remaining missing values in the cleaned dataset
+    st.markdown("### Missing Values in Each Column After Handling:")
+    st.write(step2_df.isnull().sum().sort_values(ascending=False))
+
+    # Step 3: Final Heatmap to Show No Missingness in Merged Data
+    st.subheader("Final Missing Values Heatmap After All Cleaning Steps")
     fig, ax = plt.subplots(figsize=(10, 6))
     sns.heatmap(merged_df.isnull(), cbar=False, cmap='viridis', ax=ax)
-    plt.title('Missing Values Heatmap After Handling')
+    plt.title('Final Missing Values Heatmap (No Missing Values)')
     st.pyplot(fig)
 
-    # KNN for Real Estate Data Handling
-    st.header("KNN Imputation for Real Estate Data")
-    
-    # Visualize missing values before KNN imputation
-    st.subheader("Missing Values Before Imputation for Real Estate Columns")
-    fig, ax = plt.subplots(figsize=(12, 6))
-    sns.heatmap(merged_df.isnull(), cbar=False, cmap='viridis', ax=ax)
-    plt.title("Missing Values Before Imputation")
-    st.pyplot(fig)
-
-    # Displaying KNN imputation details
-    st.markdown("""
-    For the real estate dataset, we utilized KNN imputation:
-    - **Numeric Columns**: `price`, `house_size`, `acre_lot`, `CAR_AGE`.
-    - **Categorical Column**: `CITY` was filled with the mode.
-    """)
-
-    # KNN imputation process (make sure to import KNNImputer at the top of your script)
-    from sklearn.impute import KNNImputer
-
-    # Initialize KNN Imputer
-    imputer = KNNImputer(n_neighbors=5)
-    
-    # Perform KNN imputation on numeric columns
-    numeric_cols = ['price', 'house_size', 'acre_lot', 'CAR_AGE']  # Add other numeric columns
-    merged_df[numeric_cols] = imputer.fit_transform(merged_df[numeric_cols])
-
-    # Impute categorical column (using mode)
-    categorical_cols = ['CITY']  # Add other categorical columns
-    for col in categorical_cols:
-        merged_df[col].fillna(merged_df[col].mode()[0], inplace=True)
-
-    # Visualize missing values after KNN imputation
-    st.subheader("Missing Values After Imputation")
-    fig, ax = plt.subplots(figsize=(12, 6))
-    sns.heatmap(merged_df.isnull(), cbar=False, cmap='viridis', ax=ax)
-    plt.title("Missing Values After Imputation")
-    st.pyplot(fig)
-
-    # Display remaining missing values
-    st.markdown("### Missing Values in Each Column After Handling:")
+    # Display remaining missing values in the final cleaned dataset
+    st.markdown("### Missing Values in Each Column After All Handling:")
     st.write(merged_df.isnull().sum().sort_values(ascending=False))
 
     # Success message
-    st.success("Missing values have been successfully handled using the methods outlined above.")
+    st.success("Missing values visualizations have been displayed successfully.")
 
 
 # Step 5: EDA Page

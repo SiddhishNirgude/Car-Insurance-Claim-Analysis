@@ -15,15 +15,16 @@ def load_data():
     try:
         merged_df = pd.read_csv("car_insurance_merged_data.csv")
         insurance_df = pd.read_csv("df_insurance_data_before_merge.csv")
-        return merged_df, insurance_df
+        real_estate_df = pd.read_csv("reduced_real_estate_data.csv")  # Load real estate data
+        return merged_df, insurance_df, real_estate_df
     except FileNotFoundError as e:
         st.error(f"Error: {e}. Please make sure the CSV files are in the same directory as the app.")
-        return None, None
+        return None, None, None
 
 # Load the data
-merged_df, insurance_df = load_data()
+merged_df, insurance_df, real_estate_df = load_data()
 
-if merged_df is None or insurance_df is None:
+if merged_df is None or insurance_df is None or real_estate_df is None:
     st.stop()
 else:
     st.success("Data loaded successfully!")
@@ -44,6 +45,11 @@ if page == 'Data Overview':
     st.header("Insurance Dataset (Before Merge)")
     st.write(insurance_df.head())
     st.write(f"Shape: {insurance_df.shape}")
+    
+    st.header("Real Estate Dataset")
+    st.write(real_estate_df.head())
+    st.write(f"Shape: {real_estate_df.shape}")
+
 
 # Step 3: Data Statistics Page
 elif page == 'Data Statistics':

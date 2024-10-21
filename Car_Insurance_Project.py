@@ -386,13 +386,42 @@ elif page == 'Correlation Analysis':
 elif page == 'Category Analysis':
     st.title('Category Analysis')
     
+    # Select category
     category = st.selectbox("Select Category", ['EDUCATION', 'OCCUPATION', 'CAR_TYPE'])
+    
+    # Select metric
     metric = st.radio("Select Metric", ['CLM_AMT', 'CLM_FREQ'])
     
-    fig = px.bar(insurance_df.groupby(category)[metric].mean().reset_index(), 
+    # Define sliders based on selected metric
+    if metric == 'CLM_AMT':
+        min_value = insurance_df['CLM_AMT'].min()
+        max_value = insurance_df['CLM_AMT'].max()
+        clm_amount_range = st.slider("Select Claim Amount Range", min_value=min_value, max_value=max_value, value=(min_value, max_value))
+        # Filter DataFrame based on selected range
+        filtered_df = insurance_df[(insurance_df['CLM_AMT'] >= clm_amount_range[0]) & (insurance_df['CLM_AMT'] <= clm_amount_range[1])]
+        
+        # Hypothesis for CLM_AMT
+        hypothesis = "Higher education levels are associated with lower average claim amounts."
+        
+    else:  # metric == 'CLM_FREQ'
+        min_value = insurance_df['CLM_FREQ'].min()
+        max_value = insurance_df['CLM_FREQ'].max()
+        clm_freq_range = st.slider("Select Claim Frequency Range", min_value=min_value, max_value=max_value, value=(min_value, max_value))
+        # Filter DataFrame based on selected range
+        filtered_df = insurance_df[(insurance_df['CLM_FREQ'] >= clm_freq_range[0]) & (insurance_df['CLM_FREQ'] <= clm_freq_range[1])]
+        
+        # Hypothesis for CLM_FREQ
+        hypothesis = "Individuals in certain occupations file claims more frequently than others."
+    
+    # Display the hypothesis
+    st.write("Hypothesis: ", hypothesis)
+    
+    # Group by selected category and calculate the mean of the selected metric
+    fig = px.bar(filtered_df.groupby(category)[metric].mean().reset_index(), 
                  x=category, y=metric, 
                  title=f'Average {metric} by {category}')
     st.plotly_chart(fig)
+
 
 # Step 8: Slope Analysis
 elif page == 'Slope Analysis':

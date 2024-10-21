@@ -304,10 +304,10 @@ elif page == 'Correlation Analysis':
 
     # Heatmap
     fig_heatmap = px.imshow(corr_matrix, 
-                            color_continuous_scale=color_scheme, 
-                            title=f'{corr_method.capitalize()} Correlation Heatmap',
-                            labels=dict(color="Correlation"),
-                            zmin=-1, zmax=1)
+                             color_continuous_scale=color_scheme, 
+                             title=f'{corr_method.capitalize()} Correlation Heatmap',
+                             labels=dict(color="Correlation"),
+                             zmin=-1, zmax=1)
 
     fig_heatmap.update_traces(hovertemplate='X: %{x}<br>Y: %{y}<br>Correlation: %{z:.2f}<extra></extra>')
     fig_heatmap.update_layout(width=800, height=800)
@@ -327,6 +327,7 @@ elif page == 'Correlation Analysis':
     st.subheader("Top 10 Correlations - Horizontal Bar Plot")
     top_10_corr = top_corr.head(10)
 
+    # Check if top_10_corr has sufficient entries
     if not top_10_corr.empty:
         top_10_corr_df = pd.DataFrame(top_10_corr).reset_index()
         
@@ -334,25 +335,30 @@ elif page == 'Correlation Analysis':
         if top_10_corr_df.shape[1] == 2:
             top_10_corr_df.columns = ['Variable Pair', 'Correlation']
             top_10_corr_df['Variable Pair'] = top_10_corr_df['Variable Pair'].apply(lambda x: f"{x[0]} - {x[1]}")
-        
+            
+            # Create the horizontal bar plot
             fig_bar = px.bar(top_10_corr_df, 
                              x='Correlation', 
                              y='Variable Pair', 
                              orientation='h',
                              title='Top 10 Correlations',
                              color='Correlation',
-                             color_continuous_scale=color_scheme)
+                             color_continuous_scale=color_scheme,
+                             text='Correlation')  # Display the correlation value as text on the bars
 
-            fig_bar.update_traces(texttemplate='%{x:.4f}', textposition='outside')
+            # Update hovertemplate to show correlation value and variable pair
+            fig_bar.update_traces(hovertemplate='Correlation: %{x:.4f}<br>Between: %{y}<extra></extra>')
             fig_bar.update_layout(yaxis={'categoryorder': 'total ascending'}, 
                                   xaxis_title="Correlation", 
                                   yaxis_title="Variable Pair",
                                   title_x=0.5)  # Center the title
+            
             st.plotly_chart(fig_bar)
         else:
             st.warning("Not enough data to display top correlations.")
     else:
         st.warning("No correlations to display.")
+
 
     # Download button
     csv = corr_matrix.to_csv(index=True)

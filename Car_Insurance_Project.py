@@ -63,7 +63,13 @@ if page == 'Data Overview':
       - `price`
       - `house_size`
       - `acre_lot`
-    
+
+    ### Goal of Merging the Datasets
+    By merging the car insurance claims dataset with real estate data, we aim to explore whether the **socioeconomic status** or **property characteristics** of an area have an influence on car insurance claims. Specifically, we seek to investigate the following questions:
+    1. Does living in a **wealthier** area (reflected by higher house prices) affect the **frequency** or **amount** of car insurance claims?
+    2. Do properties with **larger house sizes** or **bigger lot sizes** correlate with **higher** or **lower** car insurance claims?
+    3. Can we identify any patterns in claims based on the **relationship** between the value of real estate and the **claim amounts**?
+
     ### Merging Criteria
     - The two datasets were merged on the `ZIP_CODE` column using a **left merge**. This ensures that all records from the car insurance dataset are kept, while real estate data is added where available.
     
@@ -72,10 +78,7 @@ if page == 'Data Overview':
     2. **Missing Values**: After merging, there were missing values in some of the real estate fields (`price`, `house_size`, etc.) for ZIP codes that did not have corresponding real estate data.
     3. **Invalid ZIP Codes**: We validated that all ZIP codes in the merged dataset are 5-digit numbers.
     4. **State Mismatch**: We ensured that the `STATE` column in both datasets contained valid two-letter US state codes. In case of conflicts, we kept the state information from the car insurance dataset.
-
     """)
-
-
 
 # Step 3: Data Statistics Page
 elif page == 'Data Statistics':

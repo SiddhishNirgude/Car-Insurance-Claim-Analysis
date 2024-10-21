@@ -43,14 +43,17 @@ page = st.sidebar.radio("Go to", ['Data Overview', 'Data Statistics', 'Data Merg
 if page == 'Data Overview':
     st.title('Data Overview')
 
+    # Display the merged dataset
     st.header("Merged Dataset")
     st.write(merged_df.head())
     st.write(f"Shape: {merged_df.shape}")
     
+    # Display the insurance dataset before merge
     st.header("Insurance Dataset (Before Merge)")
     st.write(insurance_df.head())
     st.write(f"Shape: {insurance_df.shape}")
     
+    # Display the real estate dataset
     st.header("Real Estate Dataset")
     st.write(real_estate_df.head())
     st.write(f"Shape: {real_estate_df.shape}")
@@ -83,6 +86,58 @@ if page == 'Data Overview':
     3. **Invalid ZIP Codes**: We validated that all ZIP codes in the merged dataset are 5-digit numbers.
     4. **State Mismatch**: We ensured that the `STATE` column in both datasets contained valid two-letter US state codes. In case of conflicts, we kept the state information from the car insurance dataset.
     """)
+
+    # Dropdown for merged dataset column description
+    st.subheader("Column Definitions for Merged Dataset")
+
+    # Create a dictionary of definitions for each column
+    column_definitions = {
+        "ID": "A unique identifier for each record in the dataset.",
+        "KIDSDRIV": "Indicates whether there are kids in the household that drive.",
+        "BIRTH": "The birth year of the policyholder.",
+        "AGE": "The age of the policyholder.",
+        "HOMEKIDS": "Indicates whether there are kids in the household.",
+        "YOJ": "Years of Job - the number of years the policyholder has been employed.",
+        "INCOME": "The annual income of the policyholder.",
+        "PARENT1": "Indicates whether the policyholder is a single parent.",
+        "HOME_VAL": "The estimated value of the home owned by the policyholder.",
+        "MSTATUS": "Marital status of the policyholder (e.g., single, married).",
+        "GENDER": "Gender of the policyholder.",
+        "EDUCATION": "The highest level of education attained by the policyholder.",
+        "OCCUPATION": "The occupation of the policyholder.",
+        "TRAVTIME": "The average travel time to work for the policyholder.",
+        "CAR_USE": "Indicates how the policyholder primarily uses their car (e.g., personal, business).",
+        "BLUEBOOK": "The car's value according to the Blue Book.",
+        "TIF": "Time in force - indicates how long the policy has been active.",
+        "CAR_TYPE": "The type of car owned by the policyholder.",
+        "RED_CAR": "Indicates whether the car is red.",
+        "OLDCLAIM": "Indicates whether the policyholder has made an old claim.",
+        "CLM_FREQ": "The frequency of claims made by the policyholder.",
+        "REVOKED": "Indicates whether the policy has been revoked.",
+        "MVR_PTS": "Points from the Motor Vehicle Record, indicating the policyholder's driving history.",
+        "CLM_AMT": "The amount claimed by the policyholder for insurance claims.",
+        "CAR_AGE": "The age of the car owned by the policyholder.",
+        "CLAIM_FLAG": "Indicates whether a claim has been filed (binary flag).",
+        "URBANICITY": "Indicates the urban or rural status of the policyholder's residence.",
+        "ZIP_CODE": "The postal code indicating the location of the policyholder.",
+        "STATE": "The two-letter code representing the state of the policyholder.",
+        "price": "The selling price of a property in the real estate dataset.",
+        "house_size": "The size of the house, usually measured in square feet.",
+        "acre_lot": "The size of the property lot measured in acres.",
+        "CITY": "The city where the policyholder resides."
+    }
+
+    # Create a list of columns for the dropdown
+    column_options = merged_df.columns.tolist()
+
+    # Dropdown selection
+    selected_column = st.selectbox("Select a column to see its definition:", column_options)
+
+    # Display the selected column's definition
+    if selected_column in column_definitions:
+        st.write(f"**{selected_column}**: {column_definitions[selected_column]}")
+    else:
+        st.write("Definition not available for the selected column.")
 
 # Step 3: Data Statistics Page
 if page == 'Data Statistics':

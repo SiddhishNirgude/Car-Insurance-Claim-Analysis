@@ -332,8 +332,9 @@ elif page == 'Correlation Analysis':
         top_10_corr = top_corr.head(10)
 
         # Check if top_10_corr has sufficient entries
-        if not top_10_corr.empty:
+        if not top_10_corr.empty and len(top_10_corr) >= 10:
             top_10_corr_df = pd.DataFrame(top_10_corr).reset_index()
+            # Ensure that we only have 2 columns for variable pairs and correlations
             top_10_corr_df.columns = ['Variable Pair', 'Correlation']
             top_10_corr_df['Variable Pair'] = top_10_corr_df['Variable Pair'].apply(lambda x: f"{x[0]} - {x[1]}")
 
@@ -348,7 +349,8 @@ elif page == 'Correlation Analysis':
             st.pyplot(plt)  # Display the plot in Streamlit
 
         else:
-            st.warning("No correlations to display.")
+            st.warning("Not enough correlations to display top correlations.")
+
 
 
 

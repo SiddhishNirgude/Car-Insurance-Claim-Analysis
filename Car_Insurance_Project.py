@@ -92,9 +92,9 @@ if page == 'Data Statistics':
     st.markdown("""
     ### Key Statistics of the Merged Dataset
     - **Count**: The number of non-missing entries for each column.
-    - **Mean**, **Median**, **Standard Deviation**: Basic summary statistics of numerical columns like `claim_amount`, `price`, `house_size`, etc.
+    - **Mean**, **Median**, **Standard Deviation**: Basic summary statistics of numerical columns like `CLM_AMT`, `price`, `house_size`, etc.
     - **Missing Values**: After merging, certain columns from the real estate dataset may have missing values for ZIP codes without matching data.
-    - **Outliers**: High values for `claim_amount` and `price` may indicate outliers that can affect the analysis.
+    - **Outliers**: High values for `CLM_AMT` and `price` may indicate outliers that can affect the analysis.
     """)
     
     # Visualize missing data in merged dataset
@@ -135,13 +135,28 @@ if page == 'Data Statistics':
 
     if dataset_to_visualize == "Merged Dataset":
         st.write(merged_df.describe())
-        st.bar_chart(merged_df['claim_amount'])  # Example: bar chart of claim amounts
+        # Check if 'CLM_AMT' exists before plotting
+        if 'CLM_AMT' in merged_df.columns:
+            st.bar_chart(merged_df['CLM_AMT'])  # Bar chart of claim amounts
+        else:
+            st.error("Column 'CLM_AMT' not found in Merged Dataset.")
+            
     elif dataset_to_visualize == "Car Insurance Dataset":
         st.write(insurance_df.describe())
-        st.histogram_chart(insurance_df['claim_amount'])  # Example: histogram of claim amounts
+        # Check if 'CLM_AMT' exists before plotting
+        if 'CLM_AMT' in insurance_df.columns:
+            st.bar_chart(insurance_df['CLM_AMT'])  # Bar chart of claim amounts
+        else:
+            st.error("Column 'CLM_AMT' not found in Car Insurance Dataset.")
+        
     elif dataset_to_visualize == "Real Estate Dataset":
         st.write(real_estate_df.describe())
-        st.scatter_chart(real_estate_df['price'], real_estate_df['house_size'])  # Example: scatter plot of price vs house size
+        # Check if 'price' and 'house_size' exist before plotting
+        if 'price' in real_estate_df.columns and 'house_size' in real_estate_df.columns:
+            st.scatter_chart(data={'price': real_estate_df['price'], 'house_size': real_estate_df['house_size']})  # Scatter plot of price vs house size
+        else:
+            st.error("Columns 'price' and/or 'house_size' not found in Real Estate Dataset.")
+
 
 
 # Step 4: Data Merging and Missingness Page

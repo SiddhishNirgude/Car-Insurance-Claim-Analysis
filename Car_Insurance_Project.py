@@ -81,20 +81,68 @@ if page == 'Data Overview':
     """)
 
 # Step 3: Data Statistics Page
-elif page == 'Data Statistics':
+if page == 'Data Statistics':
     st.title('Data Statistics')
+
+    # Statistics for Merged Dataset
+    st.header("Merged Dataset Statistics")
+    st.write(merged_df.describe())
     
-    dataset = st.radio("Choose Dataset", ['Merged', 'Insurance (Before Merge)'])
+    # Add any notable statistics or insights about the merged dataset
+    st.markdown("""
+    ### Key Statistics of the Merged Dataset
+    - **Count**: The number of non-missing entries for each column.
+    - **Mean**, **Median**, **Standard Deviation**: Basic summary statistics of numerical columns like `claim_amount`, `price`, `house_size`, etc.
+    - **Missing Values**: After merging, certain columns from the real estate dataset may have missing values for ZIP codes without matching data.
+    - **Outliers**: High values for `claim_amount` and `price` may indicate outliers that can affect the analysis.
+    """)
     
-    if dataset == 'Merged':
-        df = merged_df
-    else:
-        df = insurance_df
+    # Visualize missing data in merged dataset
+    st.subheader("Missing Values in Merged Dataset")
+    missing_values = merged_df.isnull().sum()
+    st.write(missing_values[missing_values > 0])
     
-    st.write(df.describe())
+    # Duplicates check
+    st.subheader("Duplicate Rows in Merged Dataset")
+    duplicates_count = merged_df.duplicated(subset='ZIP_CODE').sum()
+    st.write(f"Number of duplicate rows based on ZIP_CODE: {duplicates_count}")
     
-    st.subheader("Data Types")
-    st.write(df.dtypes)
+    # Insurance Dataset Statistics
+    st.header("Car Insurance Dataset Statistics")
+    st.write(insurance_df.describe())
+    
+    st.markdown("""
+    ### Key Insights from Car Insurance Dataset
+    - **Claim Amount Distribution**: Average and spread of claim amounts provide insights into typical claim sizes.
+    - **Policyholder Data**: Examining statistics on age, accident severity, and other policyholder attributes helps identify trends.
+    """)
+    
+    # Real Estate Dataset Statistics
+    st.header("Real Estate Dataset Statistics")
+    st.write(real_estate_df.describe())
+    
+    st.markdown("""
+    ### Key Insights from Real Estate Dataset
+    - **House Price Distribution**: The range and distribution of house prices provide insights into the socioeconomic conditions of different ZIP codes.
+    - **House and Lot Size**: Comparing statistics on house size and lot size across ZIP codes helps in understanding the distribution of property characteristics.
+    """)
+    
+    # Optional visualizations for each dataset
+    st.subheader("Visualizations")
+    st.write("Select a dataset to visualize statistics:")
+
+    dataset_to_visualize = st.selectbox("Choose Dataset", ["Merged Dataset", "Car Insurance Dataset", "Real Estate Dataset"])
+
+    if dataset_to_visualize == "Merged Dataset":
+        st.write(merged_df.describe())
+        st.bar_chart(merged_df['claim_amount'])  # Example: bar chart of claim amounts
+    elif dataset_to_visualize == "Car Insurance Dataset":
+        st.write(insurance_df.describe())
+        st.histogram_chart(insurance_df['claim_amount'])  # Example: histogram of claim amounts
+    elif dataset_to_visualize == "Real Estate Dataset":
+        st.write(real_estate_df.describe())
+        st.scatter_chart(real_estate_df['price'], real_estate_df['house_size'])  # Example: scatter plot of price vs house size
+
 
 # Step 4: Data Merging and Missingness Page
 elif page == 'Data Merging and Missingness':

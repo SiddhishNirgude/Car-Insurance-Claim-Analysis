@@ -327,41 +327,29 @@ elif page == 'Correlation Analysis':
         top_25_corr_df.columns = ['Variable 1', 'Variable 2', 'Correlation']
         st.dataframe(top_25_corr_df.style.format({'Correlation': '{:.4f}'}), height=400)
         
-        # Top 10 correlations horizontal bar plot
+        # Top 10 correlations horizontal bar plot using Matplotlib and Seaborn
         st.subheader("Top 10 Correlations - Horizontal Bar Plot")
         top_10_corr = top_corr.head(10)
 
         # Check if top_10_corr has sufficient entries
         if not top_10_corr.empty:
             top_10_corr_df = pd.DataFrame(top_10_corr).reset_index()
-            
-            # Ensure the DataFrame has the correct number of columns
-            if top_10_corr_df.shape[1] == 2:
-                top_10_corr_df.columns = ['Variable Pair', 'Correlation']
-                top_10_corr_df['Variable Pair'] = top_10_corr_df['Variable Pair'].apply(lambda x: f"{x[0]} - {x[1]}")
-                
-                # Create the horizontal bar plot
-                fig_bar = px.bar(top_10_corr_df, 
-                                 x='Correlation', 
-                                 y='Variable Pair', 
-                                 orientation='h',
-                                 title='Top 10 Correlations',
-                                 color='Correlation',
-                                 color_continuous_scale=color_scheme,
-                                 text='Correlation')  # Display the correlation value as text on the bars
+            top_10_corr_df.columns = ['Variable Pair', 'Correlation']
+            top_10_corr_df['Variable Pair'] = top_10_corr_df['Variable Pair'].apply(lambda x: f"{x[0]} - {x[1]}")
 
-                # Update hovertemplate to show correlation value and variable pair
-                fig_bar.update_traces(hovertemplate='Correlation: %{x:.4f}<br>Between: %{y}<extra></extra>')
-                fig_bar.update_layout(yaxis={'categoryorder': 'total ascending'}, 
-                                      xaxis_title="Correlation", 
-                                      yaxis_title="Variable Pair",
-                                      title_x=0.5)  # Center the title
-                
-                st.plotly_chart(fig_bar)
-            else:
-                st.warning("Not enough data to display top correlations.")
+            # Create the horizontal bar plot using Matplotlib and Seaborn
+            plt.figure(figsize=(10, 6))
+            sns.barplot(x='Correlation', y='Variable Pair', data=top_10_corr_df, palette=color_scheme)
+            plt.title('Top 10 Correlation Values')
+            plt.xlabel('Correlation')
+            plt.ylabel('Variable Pair')
+            plt.xlim(-1, 1)  # Set x-axis limits
+            plt.axvline(0, color='gray', linestyle='--')  # Add a vertical line at 0
+            st.pyplot(plt)  # Display the plot in Streamlit
+
         else:
             st.warning("No correlations to display.")
+
 
 
 

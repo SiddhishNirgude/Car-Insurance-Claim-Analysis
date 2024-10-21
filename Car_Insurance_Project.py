@@ -47,7 +47,7 @@ else:
     st.success("Data loaded successfully!")
 
 # Display the car insurance illustration
-st.image("car-insurance-illustration-concept-white-background_701961-840.png", 
+st.image("Imageof-Auto-Insurance.jpg", 
          caption="Car Insurance Illustration", use_column_width=True)
 
 # Sidebar for navigation

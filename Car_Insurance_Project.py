@@ -299,65 +299,70 @@ elif page == 'Correlation Analysis':
     # Filter the DataFrame to only include selected columns
     numeric_df = merged_df[selected_columns]
 
-    # Calculate the correlation matrix for selected columns
-    corr_matrix = numeric_df.corr(method=corr_method)
-
-    # Heatmap
-    fig_heatmap = px.imshow(corr_matrix, 
-                             color_continuous_scale=color_scheme, 
-                             title=f'{corr_method.capitalize()} Correlation Heatmap',
-                             labels=dict(color="Correlation"),
-                             zmin=-1, zmax=1)
-
-    fig_heatmap.update_traces(hovertemplate='X: %{x}<br>Y: %{y}<br>Correlation: %{z:.2f}<extra></extra>')
-    fig_heatmap.update_layout(width=800, height=800)
-    st.plotly_chart(fig_heatmap)
-    
-    # Top correlations
-    top_corr = corr_matrix.unstack().sort_values(ascending=False).drop_duplicates()
-    top_corr = top_corr[top_corr < 1]  # Remove self-correlations
-    
-    # Top 25 correlations table
-    st.subheader("Top 25 Correlations")
-    top_25_corr_df = pd.DataFrame(top_corr.head(25)).reset_index()
-    top_25_corr_df.columns = ['Variable 1', 'Variable 2', 'Correlation']
-    st.dataframe(top_25_corr_df.style.format({'Correlation': '{:.4f}'}), height=400)
-    
-    # Top 10 correlations horizontal bar plot
-    st.subheader("Top 10 Correlations - Horizontal Bar Plot")
-    top_10_corr = top_corr.head(10)
-
-    # Check if top_10_corr has sufficient entries
-    if not top_10_corr.empty:
-        top_10_corr_df = pd.DataFrame(top_10_corr).reset_index()
-        
-        # Ensure the DataFrame has the correct number of columns
-        if top_10_corr_df.shape[1] == 2:
-            top_10_corr_df.columns = ['Variable Pair', 'Correlation']
-            top_10_corr_df['Variable Pair'] = top_10_corr_df['Variable Pair'].apply(lambda x: f"{x[0]} - {x[1]}")
-            
-            # Create the horizontal bar plot
-            fig_bar = px.bar(top_10_corr_df, 
-                             x='Correlation', 
-                             y='Variable Pair', 
-                             orientation='h',
-                             title='Top 10 Correlations',
-                             color='Correlation',
-                             color_continuous_scale=color_scheme,
-                             text='Correlation')  # Display the correlation value as text on the bars
-
-            # Update hovertemplate to show correlation value and variable pair
-            fig_bar.update_traces(hovertemplate='Correlation: %{x:.4f}<br>Between: %{y}<extra></extra>')
-            fig_bar.update_layout(yaxis={'categoryorder': 'total ascending'}, 
-                                  xaxis_title="Correlation", 
-                                  yaxis_title="Variable Pair",
-                                  title_x=0.5)  # Center the title
-            
-            st.plotly_chart(fig_bar)
-        else:
-            st.warning("Not enough data to display top correlations.")
+    # Check if numeric_df is empty or contains only one column
+    if numeric_df.empty or numeric_df.shape[1] < 2:
+        st.warning("Please select at least two numeric columns for correlation analysis.")
     else:
-        st.warning("No correlations to display.")
+        # Calculate the correlation matrix for selected columns
+        corr_matrix = numeric_df.corr(method=corr_method)
+
+        # Heatmap
+        fig_heatmap = px.imshow(corr_matrix, 
+                                 color_continuous_scale=color_scheme, 
+                                 title=f'{corr_method.capitalize()} Correlation Heatmap',
+                                 labels=dict(color="Correlation"),
+                                 zmin=-1, zmax=1)
+
+        fig_heatmap.update_traces(hovertemplate='X: %{x}<br>Y: %{y}<br>Correlation: %{z:.2f}<extra></extra>')
+        fig_heatmap.update_layout(width=800, height=800)
+        st.plotly_chart(fig_heatmap)
+        
+        # Top correlations
+        top_corr = corr_matrix.unstack().sort_values(ascending=False).drop_duplicates()
+        top_corr = top_corr[top_corr < 1]  # Remove self-correlations
+        
+        # Top 25 correlations table
+        st.subheader("Top 25 Correlations")
+        top_25_corr_df = pd.DataFrame(top_corr.head(25)).reset_index()
+        top_25_corr_df.columns = ['Variable 1', 'Variable 2', 'Correlation']
+        st.dataframe(top_25_corr_df.style.format({'Correlation': '{:.4f}'}), height=400)
+        
+        # Top 10 correlations horizontal bar plot
+        st.subheader("Top 10 Correlations - Horizontal Bar Plot")
+        top_10_corr = top_corr.head(10)
+
+        # Check if top_10_corr has sufficient entries
+        if not top_10_corr.empty:
+            top_10_corr_df = pd.DataFrame(top_10_corr).reset_index()
+            
+            # Ensure the DataFrame has the correct number of columns
+            if top_10_corr_df.shape[1] == 2:
+                top_10_corr_df.columns = ['Variable Pair', 'Correlation']
+                top_10_corr_df['Variable Pair'] = top_10_corr_df['Variable Pair'].apply(lambda x: f"{x[0]} - {x[1]}")
+                
+                # Create the horizontal bar plot
+                fig_bar = px.bar(top_10_corr_df, 
+                                 x='Correlation', 
+                                 y='Variable Pair', 
+                                 orientation='h',
+                                 title='Top 10 Correlations',
+                                 color='Correlation',
+                                 color_continuous_scale=color_scheme,
+                                 text='Correlation')  # Display the correlation value as text on the bars
+
+                # Update hovertemplate to show correlation value and variable pair
+                fig_bar.update_traces(hovertemplate='Correlation: %{x:.4f}<br>Between: %{y}<extra></extra>')
+                fig_bar.update_layout(yaxis={'categoryorder': 'total ascending'}, 
+                                      xaxis_title="Correlation", 
+                                      yaxis_title="Variable Pair",
+                                      title_x=0.5)  # Center the title
+                
+                st.plotly_chart(fig_bar)
+            else:
+                st.warning("Not enough data to display top correlations.")
+        else:
+            st.warning("No correlations to display.")
+
 
 
     # Download button

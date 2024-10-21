@@ -311,7 +311,6 @@ elif page == 'Correlation Analysis':
 
     fig_heatmap.update_traces(hovertemplate='X: %{x}<br>Y: %{y}<br>Correlation: %{z:.2f}<extra></extra>')
     fig_heatmap.update_layout(width=800, height=800)
-
     st.plotly_chart(fig_heatmap)
     
     # Top correlations
@@ -328,11 +327,10 @@ elif page == 'Correlation Analysis':
     st.subheader("Top 10 Correlations - Horizontal Bar Plot")
     top_10_corr = top_corr.head(10)
 
-    # Check if top_10_corr is not empty
     if not top_10_corr.empty:
         top_10_corr_df = pd.DataFrame(top_10_corr).reset_index()
         
-        # Ensure that the DataFrame has the correct number of columns
+        # Ensure the DataFrame has the correct number of columns
         if top_10_corr_df.shape[1] == 2:
             top_10_corr_df.columns = ['Variable Pair', 'Correlation']
             top_10_corr_df['Variable Pair'] = top_10_corr_df['Variable Pair'].apply(lambda x: f"{x[0]} - {x[1]}")
@@ -346,7 +344,10 @@ elif page == 'Correlation Analysis':
                              color_continuous_scale=color_scheme)
 
             fig_bar.update_traces(texttemplate='%{x:.4f}', textposition='outside')
-            fig_bar.update_layout(yaxis={'categoryorder':'total ascending'})
+            fig_bar.update_layout(yaxis={'categoryorder': 'total ascending'}, 
+                                  xaxis_title="Correlation", 
+                                  yaxis_title="Variable Pair",
+                                  title_x=0.5)  # Center the title
             st.plotly_chart(fig_bar)
         else:
             st.warning("Not enough data to display top correlations.")
@@ -361,6 +362,7 @@ elif page == 'Correlation Analysis':
         file_name=f"correlation_matrix_{corr_method}.csv",
         mime="text/csv",
     )
+
 
 # Step 7: Category Analysis
 elif page == 'Category Analysis':

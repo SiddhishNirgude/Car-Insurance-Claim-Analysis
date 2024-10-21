@@ -126,36 +126,6 @@ if page == 'Data Statistics':
     - **House Price Distribution**: The range and distribution of house prices provide insights into the socioeconomic conditions of different ZIP codes.
     - **House and Lot Size**: Comparing statistics on house size and lot size across ZIP codes helps in understanding the distribution of property characteristics.
     """)
-    
-    # Optional visualizations for each dataset
-    st.subheader("Visualizations")
-    st.write("Select a dataset to visualize statistics:")
-
-    dataset_to_visualize = st.selectbox("Choose Dataset", ["Merged Dataset", "Car Insurance Dataset", "Real Estate Dataset"])
-
-    if dataset_to_visualize == "Merged Dataset":
-        st.write(merged_df.describe())
-        # Check if 'CLM_AMT' exists before plotting
-        if 'CLM_AMT' in merged_df.columns:
-            st.bar_chart(merged_df['CLM_AMT'])  # Bar chart of claim amounts
-        else:
-            st.error("Column 'CLM_AMT' not found in Merged Dataset.")
-            
-    elif dataset_to_visualize == "Car Insurance Dataset":
-        st.write(insurance_df.describe())
-        # Check if 'CLM_AMT' exists before plotting
-        if 'CLM_AMT' in insurance_df.columns:
-            st.bar_chart(insurance_df['CLM_AMT'])  # Bar chart of claim amounts
-        else:
-            st.error("Column 'CLM_AMT' not found in Car Insurance Dataset.")
-        
-    elif dataset_to_visualize == "Real Estate Dataset":
-        st.write(real_estate_df.describe())
-        # Check if 'price' and 'house_size' exist before plotting
-        if 'price' in real_estate_df.columns and 'house_size' in real_estate_df.columns:
-            st.scatter_chart(data={'price': real_estate_df['price'], 'house_size': real_estate_df['house_size']})  # Scatter plot of price vs house size
-        else:
-            st.error("Columns 'price' and/or 'house_size' not found in Real Estate Dataset.")
 
 
 

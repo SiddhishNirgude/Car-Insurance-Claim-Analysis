@@ -680,8 +680,8 @@ elif page == 'My Objective and Conclusions':
     st.write("""
     Based on the analysis, I have drawn the following key conclusions:
     
-    1. **House size** shows a moderate correlation with claim amounts, supporting the hypothesis that larger houses tend to have higher insurance claims.
-    2. **House price** demonstrates a strong correlation with both claim amount and frequency, aligning with research that property value is a significant risk factor.
+    1. **House size** shows a weak negative correlation with claim amounts,Larger houses tend to have slightly lower insurance claims, which might suggest that homeowners with larger properties manage their risks better.
+2. **House price** demonstrates a weak negative correlation with both claim amount and frequency, indicating that more expensive houses are associated with fewer and smaller claims. This finding may suggest that higher-value property owners take more preventive measures.
     3. **MVR Points** are highly predictive of increased claim frequency and amounts, indicating that driving behavior has a direct influence on insurance claims.
     4. **YOJ (Years on Job)** has a noticeable negative correlation with claim frequency, showing that individuals with greater job stability file fewer claims.
     5. **Income levels** show a significant relationship with claim behavior, where higher incomes tend to correlate with fewer and smaller claims.

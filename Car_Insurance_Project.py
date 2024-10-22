@@ -471,90 +471,122 @@ elif page == 'Category Analysis':
 elif page == 'Slope Analysis':
     st.title('Slope Analysis')
     
-    # Define variables
+    # Add the missing import
+    from scipy import stats
+    from sklearn.linear_model import LinearRegression
+    
+    # Define variables (limit to most important ones to improve performance)
     numeric_vars = ['house_size', 'price', 'OLDCLAIM', 'CAR_AGE', 'INCOME']
     target = st.radio("Select Target Variable", ['CLM_FREQ', 'CLM_AMT'])
     
-    # Create a multi-plot figure
-    from plotly.subplots import make_subplots
-    import plotly.graph_objects as go
-    
-    # Calculate number of rows needed
-    n_vars = len(numeric_vars)
-    n_rows = (n_vars + 1) // 2  # 2 columns
-    
-    # Create subplots
-    fig = make_subplots(rows=n_rows, cols=2, 
-                        subplot_titles=[f"{var} vs {target}" for var in numeric_vars])
-    
-    # Analysis results storage
-    results = []
-    
-    # Create plots for each variable
-    for i, var in enumerate(numeric_vars):
-        row = i // 2 + 1
-        col = i % 2 + 1
-        
+    # Create a more efficient analysis function
+    @st.cache_data
+    def analyze_variable(df, var, target):
         try:
             # Remove missing values
-            mask = ~(merged_df[var].isna() | merged_df[target].isna())
-            x = merged_df[var][mask]
-            y = merged_df[target][mask]
+            mask = ~(df[var].isna() | df[target].isna())
+            x = df[var][mask]
+            y = df[target][mask]
             
             # Perform regression
-            from sklearn.linear_model import LinearRegression
             model = LinearRegression()
             X = x.values.reshape(-1, 1)
             model.fit(X, y)
-            y_pred = model.predict(X)
             
-            # Add scatter plot
-            fig.add_trace(
-                go.Scatter(x=x, y=y, mode='markers', name=var,
-                          marker=dict(opacity=0.5)),
-                row=row, col=col
-            )
+            # Calculate predictions for trend line
+            x_range = np.linspace(x.min(), x.max(), 100)
+            y_pred = model.predict(x_range.reshape(-1, 1))
             
-            # Add regression line
-            fig.add_trace(
-                go.Scatter(x=x, y=y_pred, mode='lines', name=f'{var} trend',
-                          line=dict(color='red')),
-                row=row, col=col
-            )
-            
-            # Store results
+            # Calculate statistics
             slope = model.coef_[0]
             intercept = model.intercept_
             r_value, p_value = stats.pearsonr(x, y)
             
-            results.append({
-                'Variable': var,
-                'Slope': slope,
-                'Intercept': intercept,
-                'R-value': r_value,
-                'P-value': p_value
-            })
-            
+            return {
+                'x': x,
+                'y': y,
+                'x_trend': x_range,
+                'y_trend': y_pred,
+                'slope': slope,
+                'intercept': intercept,
+                'r_value': r_value,
+                'p_value': p_value
+            }
         except Exception as e:
-            st.error(f"Error analyzing {var}: {str(e)}")
+            return None
     
-    # Update layout
-    fig.update_layout(height=300*n_rows, width=1000, showlegend=False,
-                     title_text=f"Slope Analysis for {target}")
+    # Create three columns
+    col1, col2 = st.columns(2)
     
-    # Show the plots
-    st.plotly_chart(fig)
+    with col1:
+        # Let user select a variable to analyze in detail
+        selected_var = st.selectbox("Select Variable for Detailed Analysis", numeric_vars)
+        
+        # Perform analysis for selected variable
+        results = analyze_variable(merged_df, selected_var, target)
+        
+        if results:
+            # Create detailed plot
+            fig = go.Figure()
+            
+            # Add scatter plot
+            fig.add_trace(
+                go.Scatter(x=results['x'], y=results['y'], 
+                          mode='markers', name='Data Points',
+                          marker=dict(opacity=0.5))
+            )
+            
+            # Add trend line
+            fig.add_trace(
+                go.Scatter(x=results['x_trend'], y=results['y_trend'],
+                          mode='lines', name='Trend Line',
+                          line=dict(color='red'))
+            )
+            
+            # Update layout
+            fig.update_layout(
+                title=f"{selected_var} vs {target}",
+                xaxis_title=selected_var,
+                yaxis_title=target,
+                height=400
+            )
+            
+            st.plotly_chart(fig)
+            
+            # Display statistics
+            st.write(f"**Regression Equation:** y = {results['slope']:.4f}x + {results['intercept']:.4f}")
+            st.write(f"**Correlation (r):** {results['r_value']:.4f}")
+            st.write(f"**P-value:** {results['p_value']:.4f}")
+            
+            # Interpretation
+            interpretation = (
+                f"**Interpretation:** For each unit increase in {selected_var}, "
+                f"the {target} {'increases' if results['slope'] > 0 else 'decreases'} "
+                f"by {abs(results['slope']):.4f} units."
+            )
+            st.write(interpretation)
     
-    # Show results table
-    results_df = pd.DataFrame(results)
-    st.subheader("Analysis Results")
-    st.dataframe(results_df.style.format({
-        'Slope': '{:.4f}',
-        'Intercept': '{:.4f}',
-        'R-value': '{:.4f}',
-        'P-value': '{:.4f}'
-    }))
-
+    with col2:
+        # Summary table for all variables
+        st.subheader("Summary of All Variables")
+        summary_data = []
+        
+        for var in numeric_vars:
+            results = analyze_variable(merged_df, var, target)
+            if results:
+                summary_data.append({
+                    'Variable': var,
+                    'Slope': results['slope'],
+                    'R-value': results['r_value'],
+                    'P-value': results['p_value']
+                })
+        
+        summary_df = pd.DataFrame(summary_data)
+        st.dataframe(summary_df.style.format({
+            'Slope': '{:.4f}',
+            'R-value': '{:.4f}',
+            'P-value': '{:.4f}'
+        }))
 
 
 # Add an "About" section

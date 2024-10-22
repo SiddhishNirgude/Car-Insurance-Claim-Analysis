@@ -388,18 +388,18 @@ elif page == 'Category Analysis':
 
     # Select Category
     category = st.selectbox("Select Category", ['EDUCATION', 'OCCUPATION', 'CAR_TYPE'])
-    
+
     # ---- Claim Frequency Section ----
     
     # Slider for filtering claim frequency (integral values)
     clm_freq_range = st.slider("Select Claim Frequency Range", 
-                                min_value=int(insurance_df['CLM_FREQ'].min()), 
-                                max_value=int(insurance_df['CLM_FREQ'].max()), 
-                                value=(int(insurance_df['CLM_FREQ'].min()), int(insurance_df['CLM_FREQ'].max())))
+                                min_value=int(merged_df['CLM_FREQ'].min()), 
+                                max_value=int(merged_df['CLM_FREQ'].max()), 
+                                value=(int(merged_df['CLM_FREQ'].min()), int(merged_df['CLM_FREQ'].max())))
 
     # Filter the data based on selected claim frequency range
-    filtered_freq_data = insurance_df[(insurance_df['CLM_FREQ'] >= clm_freq_range[0]) & 
-                                      (insurance_df['CLM_FREQ'] <= clm_freq_range[1])]
+    filtered_freq_data = merged_df[(merged_df['CLM_FREQ'] >= clm_freq_range[0]) & 
+                                   (merged_df['CLM_FREQ'] <= clm_freq_range[1])]
 
     # Group the data by category and claim frequency
     grouped_freq_data = filtered_freq_data.groupby([category, 'CLM_FREQ']).size().reset_index(name='Count')
@@ -421,11 +421,11 @@ elif page == 'Category Analysis':
     # ---- Claim Amount Section ----
 
     # Create labels for CLM_AMT (High, Medium, Low) based on quantiles
-    clm_amt_labels = pd.qcut(insurance_df['CLM_AMT'], q=3, labels=['Low', 'Medium', 'High'])
-    insurance_df['CLM_AMT_Range'] = clm_amt_labels
+    clm_amt_labels = pd.qcut(merged_df['CLM_AMT'], q=3, labels=['Low', 'Medium', 'High'])
+    merged_df['CLM_AMT_Range'] = clm_amt_labels
     
     # Filter the data based on claim amount
-    filtered_amt_data = insurance_df[['CLM_AMT_Range', category, 'CLM_AMT']]
+    filtered_amt_data = merged_df[['CLM_AMT_Range', category, 'CLM_AMT']]
 
     # Group the data by category and CLM_AMT_Range
     grouped_amt_data = filtered_amt_data.groupby([category, 'CLM_AMT_Range']).size().reset_index(name='Count')
@@ -474,6 +474,7 @@ elif page == 'Category Analysis':
     
     st.write("Claim Amount Hypothesis:")
     st.write(amt_hypothesis)
+
 
 
 

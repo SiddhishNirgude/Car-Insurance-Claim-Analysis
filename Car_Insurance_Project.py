@@ -471,9 +471,11 @@ elif page == 'Category Analysis':
 elif page == 'Slope Analysis':
     st.title('Slope Analysis')
     
-    # Add the missing import
+    # Add all necessary imports
     from scipy import stats
     from sklearn.linear_model import LinearRegression
+    import plotly.graph_objects as go
+    import numpy as np
     
     # Define variables (limit to most important ones to improve performance)
     numeric_vars = ['house_size', 'price', 'OLDCLAIM', 'CAR_AGE', 'INCOME']
@@ -515,7 +517,7 @@ elif page == 'Slope Analysis':
         except Exception as e:
             return None
     
-    # Create three columns
+    # Create two columns
     col1, col2 = st.columns(2)
     
     with col1:

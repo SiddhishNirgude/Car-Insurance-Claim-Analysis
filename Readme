@@ -2,25 +2,61 @@
 
 ## Project Overview
 
-This project is a comprehensive analysis of car insurance claims data, focusing on various factors that influence the frequency and amount of claims. The analysis is performed using multiple datasets, including car insurance data and real estate data, to explore relationships between policyholder attributes (e.g., house size, income, driving records) and insurance claims. The app provides functionalities for data exploration, statistical analysis, and hypothesis generation.
+This project provides a comprehensive analysis of car insurance claims data, focusing on understanding the factors that influence the frequency and amount of claims. The analysis incorporates multiple datasets, including car insurance data and real estate data, to explore the relationships between policyholder attributes (e.g., house size, income, driving records) and insurance claims. The app offers functionality for data exploration, statistical analysis, and hypothesis generation.
+
+### Objectives:
+- **Analyze** key factors affecting car insurance claims.
+- **Identify** correlations between policyholder attributes and claims.
+- **Test** hypotheses regarding the relationships between variables.
+- **Provide** insights to help insurance companies manage risk more effectively.
 
 ### Key Features:
-- **Data Overview:** General overview of the datasets.
+- **Data Overview:** A general overview of the datasets.
 - **Data Statistics:** Summary statistics of important variables.
-- **Data Merging and Missingness:** Details about data merging and handling of missing values.
+- **Data Merging and Missingness:** Details about data merging and how missing values were handled.
 - **Exploratory Data Analysis (EDA):** Visual exploration of data patterns.
 - **Correlation Analysis:** Study of relationships between variables.
-- **Category Analysis and Hypothesis:** Analysis of categorical variables and hypothesis generation.
+- **Category Analysis and Hypothesis:** Analysis of categorical variables and hypothesis testing.
 - **Slope Analysis and Hypothesis:** Linear regression analysis for key variables.
-- **My Objective and Conclusions:** Key insights and conclusions drawn from the analysis.
+- **Objective and Conclusions:** Key insights and conclusions drawn from the analysis.
+
+### Data Sources:
+- **Insurance Data:** Contains detailed information about insurance policies and claims.
+- **Real Estate Data:** Provides attributes such as house size and property value that have been merged with the insurance data.
+  
+Both datasets have been merged to explore the potential relationships between house-related attributes and insurance claims. (Provide sources and licensing information if applicable).
 
 ---
 
 ## Setup Instructions
-
-To run this Streamlit app on your local machine, follow the steps below:
+To run this Streamlit app on your local machine, follow these steps:
 
 ### Prerequisites
-1. **Python**: Make sure you have Python 3.7+ installed.
-2. **Libraries**: The required Python libraries are listed in the `requirements.txt` file.
+1. **Python**: Ensure you have Python 3.7+ installed.
+2. **Libraries**: Install the required Python libraries listed in the `requirements.txt` file.
+
+### 1. Clone the repository
+Clone the repository to your local machine:
+```bash
+git clone https://github.com/SiddhishNirgude/Car-Insurance-Claim-Analysis.git
+cd car-insurance-claims-analysis
+
+
+pip install -r requirements.txt
+
+streamlit run Car_Insurance_Project.py
+
+car-insurance-claims-analysis/
+│
+├── Car_Insurance_Project.py                  # Main script for the Streamlit app
+├── car_insurance_merged_data.csv             # Merged dataset
+├── df_insurance_data_before_merge.csv        # Primary dataset
+├── reduced_real_estate_data.csv              # Secondary dataset
+├── step1_missingness_after_merging.csv       # Missing data after merging both datasets
+├── step2_missingness_after_cleaning_insurance.csv  # Missing data after cleaning insurance data
+├── README.md               # This README file
+└── requirements.txt        # List of Python dependencies
+
+
+
 

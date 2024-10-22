@@ -470,78 +470,90 @@ elif page == 'Category Analysis':
 # Step 8: Slope Analysis
 elif page == 'Slope Analysis':
     st.title('Slope Analysis')
-
-    # Define the variable pairs for CLM_FREQ and CLM_AMT
-    clm_freq_pairs = [
-        ('house_size', 'CLM_FREQ'),
-        ('price', 'CLM_FREQ'),
-        ('OLDCLAIM', 'CLM_FREQ'),
-        ('CAR_AGE', 'CLM_FREQ'),
-        ('INCOME', 'CLM_FREQ'),
-        ('OCCUPATION_z_Blue Collar', 'CLM_FREQ'),
-        ('EDUCATION_Bachelors', 'CLM_FREQ'),
-        ('GENDER_Male', 'CLM_FREQ'),
-        ('TOWN_SIZE', 'CLM_FREQ')
-    ]
-
-    clm_amt_pairs = [
-        ('house_size', 'CLM_AMT'),
-        ('price', 'CLM_AMT'),
-        ('OLDCLAIM', 'CLM_AMT'),
-        ('CAR_AGE', 'CLM_AMT'),
-        ('INCOME', 'CLM_AMT'),
-        ('OCCUPATION_z_Blue Collar', 'CLM_AMT'),
-        ('EDUCATION_Bachelors', 'CLM_AMT'),
-        ('GENDER_Male', 'CLM_AMT'),
-        ('TOWN_SIZE', 'CLM_AMT')
-    ]
-
-    # Select variable pairs for analysis
-    analysis_choice = st.radio("Choose Analysis Type", ['CLM_FREQ Analysis', 'CLM_AMT Analysis'])
-
-    if analysis_choice == 'CLM_FREQ Analysis':
-        variable_pairs = clm_freq_pairs
-        y_label = 'Claim Frequency'
-    else:
-        variable_pairs = clm_amt_pairs
-        y_label = 'Claim Amount'
     
-    # Plot slope analysis for each pair
-    for x_var, y_var in variable_pairs:
-        # Perform linear regression
-        X = merged_df[[x_var]].values.reshape(-1, 1)  # Independent variable (reshaped for sklearn)
-        y = merged_df[y_var].values  # Dependent variable
-
-        # Create and fit the linear regression model
-        from sklearn.linear_model import LinearRegression
-        model = LinearRegression()
-        model.fit(X, y)
+    # Define variables
+    numeric_vars = ['house_size', 'price', 'OLDCLAIM', 'CAR_AGE', 'INCOME']
+    target = st.radio("Select Target Variable", ['CLM_FREQ', 'CLM_AMT'])
+    
+    # Create a multi-plot figure
+    from plotly.subplots import make_subplots
+    import plotly.graph_objects as go
+    
+    # Calculate number of rows needed
+    n_vars = len(numeric_vars)
+    n_rows = (n_vars + 1) // 2  # 2 columns
+    
+    # Create subplots
+    fig = make_subplots(rows=n_rows, cols=2, 
+                        subplot_titles=[f"{var} vs {target}" for var in numeric_vars])
+    
+    # Analysis results storage
+    results = []
+    
+    # Create plots for each variable
+    for i, var in enumerate(numeric_vars):
+        row = i // 2 + 1
+        col = i % 2 + 1
         
-        # Predict values based on the model
-        y_pred = model.predict(X)
-        
-        # Extract the slope (coefficient) and intercept
-        slope = model.coef_[0]
-        intercept = model.intercept_
-
-        # Generate the regression line equation
-        reg_line_eq = f'y = {slope:.2f}x + {intercept:.2f}'
-
-        # Create a hypothesis based on the slope
-        if slope > 0:
-            hypothesis = f"An increase in {x_var} leads to a rise in {y_label}."
-        else:
-            hypothesis = f"An increase in {x_var} leads to a decline in {y_label}."
-
-        # Plot the scatter plot and regression line using Plotly
-        fig = px.scatter(merged_df, x=x_var, y=y_var, opacity=0.6, title=f'{x_var} vs {y_var} with Regression Line')
-        fig.add_traces(px.line(x=merged_df[x_var], y=y_pred, name='Regression Line', line=dict(color='red')).data)
-
-        # Display the plot and the hypothesis
-        st.plotly_chart(fig)
-        st.write(f"Slope Analysis: **{x_var} vs {y_var}**")
-        st.write(f"Regression Line Equation: {reg_line_eq}")
-        st.write(f"Hypothesis: {hypothesis}")
+        try:
+            # Remove missing values
+            mask = ~(merged_df[var].isna() | merged_df[target].isna())
+            x = merged_df[var][mask]
+            y = merged_df[target][mask]
+            
+            # Perform regression
+            from sklearn.linear_model import LinearRegression
+            model = LinearRegression()
+            X = x.values.reshape(-1, 1)
+            model.fit(X, y)
+            y_pred = model.predict(X)
+            
+            # Add scatter plot
+            fig.add_trace(
+                go.Scatter(x=x, y=y, mode='markers', name=var,
+                          marker=dict(opacity=0.5)),
+                row=row, col=col
+            )
+            
+            # Add regression line
+            fig.add_trace(
+                go.Scatter(x=x, y=y_pred, mode='lines', name=f'{var} trend',
+                          line=dict(color='red')),
+                row=row, col=col
+            )
+            
+            # Store results
+            slope = model.coef_[0]
+            intercept = model.intercept_
+            r_value, p_value = stats.pearsonr(x, y)
+            
+            results.append({
+                'Variable': var,
+                'Slope': slope,
+                'Intercept': intercept,
+                'R-value': r_value,
+                'P-value': p_value
+            })
+            
+        except Exception as e:
+            st.error(f"Error analyzing {var}: {str(e)}")
+    
+    # Update layout
+    fig.update_layout(height=300*n_rows, width=1000, showlegend=False,
+                     title_text=f"Slope Analysis for {target}")
+    
+    # Show the plots
+    st.plotly_chart(fig)
+    
+    # Show results table
+    results_df = pd.DataFrame(results)
+    st.subheader("Analysis Results")
+    st.dataframe(results_df.style.format({
+        'Slope': '{:.4f}',
+        'Intercept': '{:.4f}',
+        'R-value': '{:.4f}',
+        'P-value': '{:.4f}'
+    }))
 
 
 

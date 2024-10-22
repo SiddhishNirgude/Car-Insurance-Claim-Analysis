@@ -342,47 +342,6 @@ elif page == 'Correlation Analysis':
         top_25_corr_df.columns = ['Variable 1', 'Variable 2', 'Correlation']
         st.dataframe(top_25_corr_df.style.format({'Correlation': '{:.4f}'}), height=400)
         
-        # Top 10 correlations horizontal bar plot using Plotly
-        st.subheader("Top 10 Correlations - Horizontal Bar Plot")
-        top_10_corr = top_corr.head(10)
-        
-        if not top_10_corr.empty:
-            top_10_corr_df = pd.DataFrame(top_10_corr).reset_index()
-            top_10_corr_df.columns = ['Variable Pair', 'Correlation']
-            top_10_corr_df['Variable Pair'] = top_10_corr_df['Variable Pair'].apply(lambda x: f"{x[0]} - {x[1]}")
-            
-            # Create horizontal bar plot using Plotly
-            fig_bar = px.bar(top_10_corr_df,
-                           x='Correlation',
-                           y='Variable Pair',
-                           orientation='h',
-                           title='Top 10 Correlations',
-                           color='Correlation',
-                           color_continuous_scale=color_scheme)
-            
-            # Update layout
-            fig_bar.update_layout(
-                yaxis={'categoryorder': 'total ascending'},  # Sort bars
-                xaxis_title="Correlation Coefficient",
-                yaxis_title="Variable Pairs",
-                showlegend=False,
-                width=800,
-                height=500
-            )
-            
-            # Add zero line
-            fig_bar.add_vline(x=0, line_width=1, line_dash="dash", line_color="gray")
-            
-            # Update hover template
-            fig_bar.update_traces(
-                hovertemplate="Correlation: %{x:.4f}<extra></extra>"
-            )
-            
-            # Show the plot
-            st.plotly_chart(fig_bar)
-        else:
-            st.warning("Not enough correlations to display top correlations.")
-
 
     # Download button
     csv = corr_matrix.to_csv(index=True)

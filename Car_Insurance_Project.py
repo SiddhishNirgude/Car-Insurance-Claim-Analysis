@@ -388,95 +388,42 @@ elif page == 'Category Analysis':
 
     # Select Category
     category = st.selectbox("Select Category", ['EDUCATION', 'OCCUPATION', 'CAR_TYPE'])
-
-    # ---- Claim Frequency Section ----
     
-    # Slider for filtering claim frequency (integral values)
-    clm_freq_range = st.slider("Select Claim Frequency Range", 
-                                min_value=int(merged_df['CLM_FREQ'].min()), 
-                                max_value=int(merged_df['CLM_FREQ'].max()), 
-                                value=(int(merged_df['CLM_FREQ'].min()), int(merged_df['CLM_FREQ'].max())))
+    # Radio button to select between CLM_FREQ and CLM_AMT
+    metric = st.radio("Select Metric", ['CLM_AMT', 'CLM_FREQ'])
 
-    # Filter the data based on selected claim frequency range
-    filtered_freq_data = merged_df[(merged_df['CLM_FREQ'] >= clm_freq_range[0]) & 
-                                   (merged_df['CLM_FREQ'] <= clm_freq_range[1])]
+    # Slider for filtering claim amount
+    if metric == 'CLM_AMT':
+        clm_amt_range = st.slider("Select Claim Amount Range", 
+                                   min_value=float(insurance_df['CLM_AMT'].min()), 
+                                   max_value=float(insurance_df['CLM_AMT'].max()), 
+                                   value=(float(insurance_df['CLM_AMT'].min()), float(insurance_df['CLM_AMT'].max())))
+        filtered_data = insurance_df[(insurance_df['CLM_AMT'] >= clm_amt_range[0]) & 
+                                      (insurance_df['CLM_AMT'] <= clm_amt_range[1])]
 
-    # Group the data by category and claim frequency
-    grouped_freq_data = filtered_freq_data.groupby([category, 'CLM_FREQ']).size().reset_index(name='Count')
+        # Calculate dynamic hypotheses based on filtered data
+        avg_clm_amt = filtered_data.groupby(category)['CLM_AMT'].mean().reset_index()
+        max_clm_amt = avg_clm_amt['CLM_AMT'].max()
+        min_clm_amt = avg_clm_amt['CLM_AMT'].min()
 
-    # Sort the data by category in ascending order
-    grouped_freq_data = grouped_freq_data.sort_values(by=[category])
+        # Generate dynamic hypothesis for Claim Amount
+        dynamic_hypothesis = (
+            f"For {category}, the average claim amount ranges from {min_clm_amt:.2f} to {max_clm_amt:.2f}. "
+            "This suggests that higher claim amounts may correlate with certain categories, implying that individuals "
+            "in these groups might be at greater risk or have more expensive claims."
+        )
 
-    # Stacked column chart (bar chart) for CLM_FREQ
-    fig_freq = px.bar(grouped_freq_data, 
-                      x=category, 
-                      y='Count', 
-                      color='CLM_FREQ',  # Stack by CLM_FREQ
-                      title=f'Stacked Bar Chart of Claim Frequency by {category}',
-                      labels={'Count': 'Number of Claims', 'CLM_FREQ': 'Claim Frequency'},
-                      barmode='stack')
+        # Display the dynamically generated hypothesis
+        st.write("Dynamic Hypothesis:")
+        st.write(dynamic_hypothesis)
 
-    st.plotly_chart(fig_freq)
-    
-    # ---- Claim Amount Section ----
-
-    # Create labels for CLM_AMT (High, Medium, Low) based on quantiles
-    clm_amt_labels = pd.qcut(merged_df['CLM_AMT'], q=3, labels=['Low', 'Medium', 'High'])
-    merged_df['CLM_AMT_Range'] = clm_amt_labels
-    
-    # Filter the data based on claim amount
-    filtered_amt_data = merged_df[['CLM_AMT_Range', category, 'CLM_AMT']]
-
-    # Group the data by category and CLM_AMT_Range
-    grouped_amt_data = filtered_amt_data.groupby([category, 'CLM_AMT_Range']).size().reset_index(name='Count')
-
-    # Sort the data by category in ascending order
-    grouped_amt_data = grouped_amt_data.sort_values(by=[category])
-
-    # Stacked column chart (bar chart) for CLM_AMT_Range
-    fig_amt = px.bar(grouped_amt_data, 
-                     x=category, 
-                     y='Count', 
-                     color='CLM_AMT_Range',  # Stack by CLM_AMT range (Low, Medium, High)
-                     title=f'Stacked Bar Chart of Claim Amount by {category}',
-                     labels={'Count': 'Number of Claims', 'CLM_AMT_Range': 'Claim Amount Range'},
-                     barmode='stack')
-
-    st.plotly_chart(fig_amt)
-
-    # ---- Dynamic Hypothesis ----
-
-    # Hypothesis for CLM_FREQ
-    most_frequent_category = grouped_freq_data.groupby(category)['Count'].sum().idxmax()
-    max_clm_freq = filtered_freq_data['CLM_FREQ'].max()
-    min_clm_freq = filtered_freq_data['CLM_FREQ'].min()
-
-    freq_hypothesis = (
-        f"In the {category} category, {most_frequent_category} shows the highest claim frequency. "
-        f"Claim frequencies range from {min_clm_freq} to {max_clm_freq}. "
-        f"This suggests that individuals in this subgroup tend to file more frequent claims."
-    )
-
-    # Hypothesis for CLM_AMT
-    most_amt_category = grouped_amt_data.groupby(category)['Count'].sum().idxmax()
-    amt_ranges = filtered_amt_data['CLM_AMT_Range'].value_counts().to_dict()
-
-    amt_hypothesis = (
-        f"In the {category} category, {most_amt_category} exhibits the highest claim amounts. "
-        f"Claim amounts are distributed across the following ranges: {amt_ranges}. "
-        f"This indicates that individuals in this group are more likely to file claims with {most_amt_category} claim amounts."
-    )
-
-    # Display the dynamically generated hypotheses
-    st.write("Dynamic Hypotheses:")
-    st.write("Claim Frequency Hypothesis:")
-    st.write(freq_hypothesis)
-    
-    st.write("Claim Amount Hypothesis:")
-    st.write(amt_hypothesis)
-
-
-
+        # Create the bar chart for CLM_AMT
+        fig_amt = px.bar(avg_clm_amt, 
+                         x=category, 
+                         y='CLM_AMT', 
+                         title=f'Average Claim Amount by {category}',
+                         labels={'CLM_AMT': 'Average Claim Amount'})
+        st.plotly_chart(fig_amt)
 
 
 # Step 8: Slope Analysis

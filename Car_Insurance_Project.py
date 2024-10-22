@@ -52,8 +52,16 @@ st.image("Imageof-Auto-Insurance.jpg",
 
 # Sidebar for navigation
 st.sidebar.title('Navigation')
-page = st.sidebar.radio("Go to", ['Data Overview', 'Data Statistics', 'Data Merging and Missingness', 
-                                    'EDA', 'Correlation Analysis', 'Category Analysis', 'Slope Analysis'])
+page = st.sidebar.radio("Go to", [
+    'Data Overview', 
+    'Data Statistics', 
+    'Data Merging and Missingness', 
+    'EDA', 
+    'Correlation Analysis', 
+    'Category Analysis and Hypothesis', 
+    'Slope Analysis and Hypothesis',     
+    'My Objective and Conclusions'       
+])
 
 
 # Step 2: Data Overview Page

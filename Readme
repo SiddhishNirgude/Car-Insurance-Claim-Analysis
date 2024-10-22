@@ -1,1 +1,31 @@
+# Car Insurance Claims Analysis
 
+## Project Overview
+
+This project is a comprehensive analysis of car insurance claims data, focusing on various factors that influence the frequency and amount of claims. The analysis is performed using multiple datasets, including car insurance data and real estate data, to explore relationships between policyholder attributes (e.g., house size, income, driving records) and insurance claims. The app provides functionalities for data exploration, statistical analysis, and hypothesis generation.
+
+### Key Features:
+- **Data Overview:** General overview of the datasets.
+- **Data Statistics:** Summary statistics of important variables.
+- **Data Merging and Missingness:** Details about data merging and handling of missing values.
+- **Exploratory Data Analysis (EDA):** Visual exploration of data patterns.
+- **Correlation Analysis:** Study of relationships between variables.
+- **Category Analysis and Hypothesis:** Analysis of categorical variables and hypothesis generation.
+- **Slope Analysis and Hypothesis:** Linear regression analysis for key variables.
+- **My Objective and Conclusions:** Key insights and conclusions drawn from the analysis.
+
+---
+
+## Setup Instructions
+
+To run this Streamlit app on your local machine, follow the steps below:
+
+### Prerequisites
+1. **Python**: Make sure you have Python 3.7+ installed.
+2. **Libraries**: The required Python libraries are listed in the `requirements.txt` file.
+
+### 1. Clone the repository
+First, clone the repository to your local machine:
+```bash
+git clone https://github.com/yourusername/car-insurance-claims-analysis.git
+cd car-insurance-claims-analysis

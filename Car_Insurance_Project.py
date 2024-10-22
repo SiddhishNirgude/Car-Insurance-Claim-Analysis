@@ -392,16 +392,18 @@ elif page == 'Category Analysis':
     # Radio button to select between CLM_FREQ and CLM_AMT
     metric = st.radio("Select Metric", ['CLM_AMT', 'CLM_FREQ'])
 
-    # Slider for filtering claim amount
+    # Slider for filtering data based on the selected metric
     if metric == 'CLM_AMT':
+        # Claim Amount Slider
         clm_amt_range = st.slider("Select Claim Amount Range", 
                                    min_value=float(insurance_df['CLM_AMT'].min()), 
                                    max_value=float(insurance_df['CLM_AMT'].max()), 
                                    value=(float(insurance_df['CLM_AMT'].min()), float(insurance_df['CLM_AMT'].max())))
+        # Filter data for claim amount
         filtered_data = insurance_df[(insurance_df['CLM_AMT'] >= clm_amt_range[0]) & 
                                       (insurance_df['CLM_AMT'] <= clm_amt_range[1])]
 
-        # Calculate dynamic hypotheses based on filtered data
+        # Calculate dynamic hypotheses for Claim Amount
         avg_clm_amt = filtered_data.groupby(category)['CLM_AMT'].mean().reset_index()
         max_clm_amt = avg_clm_amt['CLM_AMT'].max()
         min_clm_amt = avg_clm_amt['CLM_AMT'].min()
@@ -413,7 +415,7 @@ elif page == 'Category Analysis':
             "in these groups might be at greater risk or have more expensive claims."
         )
 
-        # Display the dynamically generated hypothesis
+        # Display the dynamically generated hypothesis for Claim Amount
         st.write("Dynamic Hypothesis:")
         st.write(dynamic_hypothesis)
 
@@ -424,6 +426,45 @@ elif page == 'Category Analysis':
                          title=f'Average Claim Amount by {category}',
                          labels={'CLM_AMT': 'Average Claim Amount'})
         st.plotly_chart(fig_amt)
+
+    elif metric == 'CLM_FREQ':
+        # Claim Frequency Slider
+        clm_freq_range = st.slider("Select Claim Frequency Range", 
+                                    min_value=int(insurance_df['CLM_FREQ'].min()), 
+                                    max_value=int(insurance_df['CLM_FREQ'].max()), 
+                                    value=(int(insurance_df['CLM_FREQ'].min()), int(insurance_df['CLM_FREQ'].max())))
+        # Filter data for claim frequency
+        filtered_data = insurance_df[(insurance_df['CLM_FREQ'] >= clm_freq_range[0]) & 
+                                      (insurance_df['CLM_FREQ'] <= clm_freq_range[1])]
+
+        # Group data by category and claim frequency
+        grouped_data = filtered_data.groupby([category, 'CLM_FREQ']).size().reset_index(name='Count')
+
+        # Stacked column chart (bar chart) for CLM_FREQ
+        fig_freq = px.bar(grouped_data, 
+                          x=category, 
+                          y='Count', 
+                          color='CLM_FREQ',  # Stack by CLM_FREQ
+                          title=f'Stacked Bar Chart of Claim Frequency by {category}',
+                          labels={'Count': 'Number of Claims', 'CLM_FREQ': 'Claim Frequency'},
+                          barmode='stack')
+
+        st.plotly_chart(fig_freq)
+
+        # Generate a dynamic hypothesis for Claim Frequency
+        max_clm_freq = filtered_data['CLM_FREQ'].max()
+        min_clm_freq = filtered_data['CLM_FREQ'].min()
+        
+        dynamic_hypothesis = (
+            f"In the {category} category, claim frequencies range from {min_clm_freq} to {max_clm_freq}. "
+            "This suggests that different subgroups within this category may have varying levels of risk or claim patterns, "
+            "leading to different claim frequencies."
+        )
+
+        # Display the dynamically generated hypothesis for Claim Frequency
+        st.write("Dynamic Hypothesis:")
+        st.write(dynamic_hypothesis)
+
 
 
 # Step 8: Slope Analysis

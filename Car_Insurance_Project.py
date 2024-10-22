@@ -362,8 +362,8 @@ elif page == 'Correlation Analysis':
 
 
 # Step 7: Category Analysis
-elif page == 'Category Analysis':
-    st.title('Category Analysis')
+elif page == 'Category Analysis and Hypothesis':
+    st.title('Category Analysis and Hypothesis')
 
     # Define research-backed hypotheses for each category
     category_hypotheses = {
@@ -501,8 +501,8 @@ elif page == 'Category Analysis':
 
 
 # Step 8: Slope Analysis
-elif page == 'Slope Analysis':
-    st.title('Slope Analysis and Hypothesis Generation')
+elif page == 'Slope Analysis and Hypothesis':
+    st.title('Slope Analysis and Hypothesis')
     
     # Import required libraries
     from scipy import stats

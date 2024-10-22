@@ -468,8 +468,8 @@ elif page == 'Category Analysis':
 
 
 # Step 8: Slope Analysis
-elif page == 'Slope Analysis and Hypothesis Generation':
-    st.title('Slope Analysis and Hypothesis Generation')
+elif page == 'Slope Analysis':
+    st.title('Slope Analysis')
     
     # Import required libraries
     from scipy import stats

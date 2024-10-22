@@ -384,130 +384,57 @@ elif page == 'Correlation Analysis':
 
 # Step 7: Category Analysis
 elif page == 'Category Analysis':
-    st.title('Category Analysis')
-
-    # Define research-backed hypotheses for each category
-    category_hypotheses = {
-        'EDUCATION': {
-            'CLM_AMT': {
-                'hypothesis': "Educational attainment levels show significant correlation with claim amounts, where higher education levels typically associate with lower claim amounts.",
-                'research': "Research by Martinez et al. (2021) in Risk Analysis Quarterly found that educational attainment significantly influences insurance claim patterns, with higher education levels correlating to 15% lower average claim amounts.",
-                'link': "https://doi.org/10.1111/raq.13855"
-            },
-            'CLM_FREQ': {
-                'hypothesis': "Higher education levels correlate with lower claim frequencies, possibly due to risk-aware behavior and better decision-making.",
-                'research': "A comprehensive study by Thompson et al. (2020) in the Journal of Insurance Studies demonstrated that individuals with advanced degrees file 25% fewer claims compared to those with basic education.",
-                'link': "https://doi.org/10.1016/j.ins.2020.05.001"
-            }
-        },
-        'OCCUPATION': {
-            'CLM_AMT': {
-                'hypothesis': "Claim amounts vary significantly across occupations, with high-risk occupations showing higher average claim amounts.",
-                'research': "Wilson & Roberts (2022) in Occupational Risk Analysis found that certain occupations, particularly those involving frequent driving or irregular hours, showed 30% higher claim amounts.",
-                'link': "https://doi.org/10.1007/ora.2022.12345"
-            },
-            'CLM_FREQ': {
-                'hypothesis': "Occupation type significantly influences claim frequency, with certain professional categories showing distinct claiming patterns.",
-                'research': "Anderson et al. (2021) in the Insurance Research Journal found that blue-collar workers file claims 40% more frequently than white-collar workers, largely due to exposure to different risk factors.",
-                'link': "https://doi.org/10.1111/irj.2021.789"
-            }
-        },
-        'CAR_TYPE': {
-            'CLM_AMT': {
-                'hypothesis': "Different car types show varying patterns in claim amounts, with luxury and sports vehicles associated with higher claim amounts.",
-                'research': "Lee & Davidson (2023) in Automotive Insurance Analytics found that sports cars and luxury vehicles had average claim amounts 45% higher than standard vehicles.",
-                'link': "https://doi.org/10.1016/j.aia.2023.01.002"
-            },
-            'CLM_FREQ': {
-                'hypothesis': "Car type significantly influences claim frequency, with certain vehicle categories showing higher incident rates.",
-                'research': "Johnson et al. (2022) in Vehicle Risk Assessment Quarterly demonstrated that SUVs and sports cars had 35% higher claim frequencies compared to sedans.",
-                'link': "https://doi.org/10.1007/vraq.2022.567"
-            }
-        }
-    }
-
-    # Select Category
-    category = st.selectbox("Select Category", ['EDUCATION', 'OCCUPATION', 'CAR_TYPE'])
-    
-    # Radio button to select between CLM_FREQ and CLM_AMT
-    metric = st.radio("Select Metric", ['CLM_AMT', 'CLM_FREQ'])
-
-    # Display research-backed hypothesis
-    st.subheader("Research-Backed Hypothesis")
-    st.write(category_hypotheses[category][metric]['hypothesis'])
-    st.write("**Research Evidence:**")
-    st.write(category_hypotheses[category][metric]['research'])
-    st.markdown(f"[Access Research Paper]({category_hypotheses[category][metric]['link']})")
+    # [Previous code remains the same until the plotting part]
 
     if metric == 'CLM_AMT':
-        # Claim Amount Slider
-        clm_amt_range = st.slider("Select Claim Amount Range", 
-                               min_value=float(insurance_df['CLM_AMT'].min()), 
-                               max_value=float(insurance_df['CLM_AMT'].max()), 
-                               value=(float(insurance_df['CLM_AMT'].min()), float(insurance_df['CLM_AMT'].max())))
-        
-        # Filter data for claim amount
-        filtered_data = insurance_df[(insurance_df['CLM_AMT'] >= clm_amt_range[0]) & 
-                                   (insurance_df['CLM_AMT'] <= clm_amt_range[1])]
+        # [Previous slider and filtering code remains the same]
 
-        # Calculate average claim amounts
+        # Calculate average claim amounts and sort in descending order
         avg_clm_amt = filtered_data.groupby(category)['CLM_AMT'].agg(['mean', 'count', 'std']).reset_index()
+        avg_clm_amt = avg_clm_amt.sort_values('mean', ascending=False)  # Sort by mean in descending order
         
         # Create the bar chart for CLM_AMT with error bars
         fig_amt = px.bar(avg_clm_amt, 
                         x=category, 
                         y='mean',
                         error_y='std', 
-                        title=f'Average Claim Amount by {category}',
+                        title=f'Average Claim Amount by {category} (Sorted by Amount)',
                         labels={'mean': 'Average Claim Amount'},
                         hover_data=['count'])
         
+        # Update layout to maintain the sorting
+        fig_amt.update_layout(xaxis={'categoryorder': 'total descending'})
+        
         st.plotly_chart(fig_amt)
 
-        # Statistical summary
-        st.subheader("Statistical Summary")
-        summary_text = (
-            f"Analysis shows significant variation in claim amounts across different {category.lower()} categories. "
-            f"The highest average claim amount is {avg_clm_amt['mean'].max():.2f}, while the lowest is {avg_clm_amt['mean'].min():.2f}. "
-            "This pattern aligns with previous research findings."
-        )
-        st.write(summary_text)
+        # [Rest of CLM_AMT code remains the same]
 
     elif metric == 'CLM_FREQ':
-        # Claim Frequency Slider
-        clm_freq_range = st.slider("Select Claim Frequency Range", 
-                                 min_value=int(insurance_df['CLM_FREQ'].min()), 
-                                 max_value=int(insurance_df['CLM_FREQ'].max()), 
-                                 value=(int(insurance_df['CLM_FREQ'].min()), int(insurance_df['CLM_FREQ'].max())))
-        
-        # Filter data for claim frequency
-        filtered_data = insurance_df[(insurance_df['CLM_FREQ'] >= clm_freq_range[0]) & 
-                                   (insurance_df['CLM_FREQ'] <= clm_freq_range[1])]
+        # [Previous slider and filtering code remains the same]
 
-        # Group data by category and claim frequency
+        # Group data by category and claim frequency and sort
         grouped_data = filtered_data.groupby([category, 'CLM_FREQ']).size().reset_index(name='Count')
         
-        # Create stacked bar chart
+        # Calculate total claims per category for sorting
+        total_claims = grouped_data.groupby(category)['Count'].sum().sort_values(ascending=False)
+        category_order = total_claims.index.tolist()
+        
+        # Create stacked bar chart with sorted categories
         fig_freq = px.bar(grouped_data, 
                          x=category, 
                          y='Count', 
                          color='CLM_FREQ',
-                         title=f'Claim Frequency Distribution by {category}',
+                         title=f'Claim Frequency Distribution by {category} (Sorted by Total Claims)',
                          labels={'Count': 'Number of Claims', 'CLM_FREQ': 'Claim Frequency'},
-                         barmode='stack')
+                         barmode='stack',
+                         category_orders={category: category_order})  # Specify the category order
+        
+        # Update layout to maintain the sorting
+        fig_freq.update_layout(xaxis={'categoryorder': 'total descending'})
         
         st.plotly_chart(fig_freq)
 
-        # Statistical summary
-        st.subheader("Statistical Summary")
-        avg_freq = filtered_data.groupby(category)['CLM_FREQ'].mean()
-        summary_text = (
-            f"Analysis of claim frequency across {category.lower()} categories reveals distinct patterns. "
-            f"The highest average claim frequency is {avg_freq.max():.2f}, while the lowest is {avg_freq.min():.2f}. "
-            "These findings support the research hypothesis."
-        )
-        st.write(summary_text)
-
+        # [Rest of the code remains the same]
 
 
 # Step 8: Slope Analysis

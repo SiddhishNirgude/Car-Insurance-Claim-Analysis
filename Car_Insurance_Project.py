@@ -638,6 +638,55 @@ elif page == 'Slope Analysis':
         st.success("This relationship is statistically significant (p < 0.05)")
     else:
         st.warning("This relationship is not statistically significant (p ≥ 0.05)")
+        
+# Step 9: My Objective and Conclusions
+elif page == 'My Objective and Conclusions':
+    st.title('My Objective and Conclusions')
+    
+    # Objective Section
+    st.header("Objective")
+    st.write("""
+    The objective of this project is to analyze key factors that influence insurance claims, 
+    including both the amount of claims (CLM_AMT) and the frequency of claims (CLM_FREQ). 
+    I explored various aspects such as the relationship between policyholder attributes (e.g., house size, income, MVR points), 
+    and the insurance claims data to generate hypotheses and draw meaningful insights.
+    """)
+
+    # Merged Datasets Section
+    st.header("Datasets Merged")
+    st.write("""
+    I merged two primary datasets: 
+    1. **Car Insurance Claims Dataset**: This dataset includes information on car insurance claims, such as `CLM_AMT` (claim amounts) and `CLM_FREQ` (claim frequency), along with other policyholder details.
+    2. **Real Estate Dataset**: This dataset contains information about the socioeconomic status of policyholders' areas, including `price` (house price), `house_size` (property size), and `acre_lot` (lot size).
+
+    The datasets were merged on the `ZIP_CODE` column using a left merge, ensuring that all records from the car insurance claims dataset were retained, with real estate data being added where available.
+
+    **Challenges faced during merging:**
+    - We handled duplicate ZIP codes to avoid duplicating rows.
+    - Some ZIP codes lacked corresponding real estate data, leading to missing values for certain properties (e.g., `price`, `house_size`).
+    - We validated the `ZIP_CODE` field to ensure it consisted of valid 5-digit numbers and resolved conflicts in state codes by retaining state information from the car insurance dataset.
+    """)
+
+    # Conclusions Section
+    st.header("Conclusions Drawn")
+    st.write("""
+    Based on the analysis, I have drawn the following key conclusions:
+    
+    1. **House size** shows a moderate correlation with claim amounts, supporting the hypothesis that larger houses tend to have higher insurance claims.
+    2. **House price** demonstrates a strong correlation with both claim amount and frequency, aligning with research that property value is a significant risk factor.
+    3. **MVR Points** are highly predictive of increased claim frequency and amounts, indicating that driving behavior has a direct influence on insurance claims.
+    4. **YOJ (Years on Job)** has a noticeable negative correlation with claim frequency, showing that individuals with greater job stability file fewer claims.
+    5. **Income levels** show a significant relationship with claim behavior, where higher incomes tend to correlate with fewer and smaller claims.
+    6. **Previous claims (OLDCLAIM)** are a strong predictor of future claims, suggesting that past claiming behavior is consistent over time.
+    
+    For the categorical variables:
+    
+    - **Education**: Higher education levels were associated with lower claim amounts and frequencies, possibly due to better risk management.
+    - **Occupation**: Occupations involving higher risk (e.g., blue-collar jobs) tended to show higher claim frequencies and amounts.
+    - **Car Type**: Luxury and sports cars were found to be associated with significantly higher claim amounts and frequencies compared to standard vehicles.
+    """)
+
+    st.write("These findings offer valuable insights into how various factors influence insurance claims, helping insurers better understand risk profiles and pricing strategies.")
 
 
 # Add an "About" section

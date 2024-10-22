@@ -24,8 +24,3 @@ To run this Streamlit app on your local machine, follow the steps below:
 1. **Python**: Make sure you have Python 3.7+ installed.
 2. **Libraries**: The required Python libraries are listed in the `requirements.txt` file.
 
-### 1. Clone the repository
-First, clone the repository to your local machine:
-```bash
-git clone https://github.com/yourusername/car-insurance-claims-analysis.git
-cd car-insurance-claims-analysis

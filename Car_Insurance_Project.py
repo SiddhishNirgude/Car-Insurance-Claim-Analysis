@@ -506,18 +506,44 @@ elif page == 'Slope Analysis':
         variable_pairs = clm_amt_pairs
         y_label = 'Claim Amount'
     
-    # Plot slope analysis
+    # Plot slope analysis for each pair
     for x_var, y_var in variable_pairs:
-        slope = np.polyfit(insurance_df[x_var], insurance_df[y_var], 1)
-        line = np.poly1d(slope)
+        # Perform linear regression
+        X = merged_df[[x_var]].values.reshape(-1, 1)  # Independent variable (reshaped for sklearn)
+        y = merged_df[y_var].values  # Dependent variable
+
+        # Create and fit the linear regression model
+        from sklearn.linear_model import LinearRegression
+        model = LinearRegression()
+        model.fit(X, y)
         
-        fig, ax = plt.subplots()
-        ax.scatter(insurance_df[x_var], insurance_df[y_var], alpha=0.5)
-        ax.plot(insurance_df[x_var], line(insurance_df[x_var]), color='red')
-        ax.set_xlabel(x_var)
-        ax.set_ylabel(y_label)
-        ax.set_title(f'Slope Analysis: {x_var} vs {y_var}')
-        st.pyplot(fig)
+        # Predict values based on the model
+        y_pred = model.predict(X)
+        
+        # Extract the slope (coefficient) and intercept
+        slope = model.coef_[0]
+        intercept = model.intercept_
+
+        # Generate the regression line equation
+        reg_line_eq = f'y = {slope:.2f}x + {intercept:.2f}'
+
+        # Create a hypothesis based on the slope
+        if slope > 0:
+            hypothesis = f"An increase in {x_var} leads to a rise in {y_label}."
+        else:
+            hypothesis = f"An increase in {x_var} leads to a decline in {y_label}."
+
+        # Plot the scatter plot and regression line using Plotly
+        fig = px.scatter(merged_df, x=x_var, y=y_var, opacity=0.6, title=f'{x_var} vs {y_var} with Regression Line')
+        fig.add_traces(px.line(x=merged_df[x_var], y=y_pred, name='Regression Line', line=dict(color='red')).data)
+
+        # Display the plot and the hypothesis
+        st.plotly_chart(fig)
+        st.write(f"Slope Analysis: **{x_var} vs {y_var}**")
+        st.write(f"Regression Line Equation: {reg_line_eq}")
+        st.write(f"Hypothesis: {hypothesis}")
+
+
 
 # Add an "About" section
 if st.sidebar.checkbox("Show About"):
